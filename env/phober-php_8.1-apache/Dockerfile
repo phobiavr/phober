@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM php:8.1.0RC1-apache
 
 LABEL maintainer="Hikmat Abdukhaligov"
 
@@ -39,7 +39,7 @@ RUN a2enmod rewrite headers
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 
 # Composer.
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

@@ -13,6 +13,8 @@ services:
         volumes:
             - ./env/mysql:/docker-entrypoint-initdb.d
             - dbdata:/var/lib/mysql
+        networks:
+            - backend
 
     phpmyadmin:
         image: phpmyadmin
@@ -27,6 +29,8 @@ services:
             PMA_ARBITRARY: 1
         ports:
             - 8900:80
+        networks:
+            - backend
 
     config-server:
         image: phober-php_8.1-apache
@@ -41,14 +45,16 @@ services:
             - ./config-server:/var/www/html
         depends_on:
             - db
+        networks:
+            - backend
 
     adminpanel:
-#        build:
-#            args:
-#                user: user
-#                uid: 1000
-#            context: ./
-#            dockerfile: ./env/phober-php_8.1-apache/Dockerfile
+        build:
+            args:
+                user: user
+                uid: 1000
+            context: ./
+            dockerfile: ./env/phober-php_8.1-apache/Dockerfile
         image: phober-php_8.1-apache
         container_name: adminpanel
         restart: unless-stopped
@@ -62,6 +68,8 @@ services:
         depends_on:
             - db
             - phpmyadmin
+        networks:
+            - backend
 
     device-service:
         image: phober-php_8.1-apache
@@ -76,6 +84,8 @@ services:
             - ./device-service:/var/www/html
         depends_on:
             - adminpanel
+        networks:
+            - backend
 
     auth-server:
         image: phober-php_8.1-apache
@@ -90,6 +100,11 @@ services:
             - ./auth-server:/var/www/html
         depends_on:
             - adminpanel
+        networks:
+            - backend
 
 volumes:
     dbdata:
+
+networks:
+  backend:
