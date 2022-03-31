@@ -1,0 +1,9 @@
+[submodule "adminpanel"]
+	path = adminpanel
+	url = https://github.com/phobiavr/phober-adminpanel
+[submodule "auth-server"]
+	path = auth-server
+	url = https://github.com/phobiavr/phober-auth-server
+[submodule "device-service"]
+	path = device-service
+	url = https://github.com/phobiavr/phober-device-service.git

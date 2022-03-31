@@ -1,0 +1,81 @@
+version: "3.7"
+
+services:
+    db:
+        image: mysql:8.0
+        container_name: db
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        ports:
+            - 3306:3306
+        volumes:
+            - ./env/mysql:/docker-entrypoint-initdb.d
+            - dbdata:/var/lib/mysql
+
+    phpmyadmin:
+        image: phpmyadmin
+        container_name: phpmyadmin
+        links:
+            - db
+        depends_on:
+            - db
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            PMA_ARBITRARY: 1
+        ports:
+            - 8900:80
+
+    adminpanel:
+#        build:
+#            args:
+#                user: user
+#                uid: 1000
+#            context: ./
+#            dockerfile: ./env/phober-php_8.1-apache/Dockerfile
+        image: phober-php_8.1-apache
+        container_name: adminpanel
+        restart: unless-stopped
+        ports:
+            - 8200:80
+        environment:
+            - APACHE_RUN_USER=#1000
+            - APACHE_RUN_GROUP=#1000
+        volumes:
+            - ./adminpanel:/var/www/html
+        depends_on:
+            - db
+            - phpmyadmin
+
+    device-service:
+        image: phober-php_8.1-apache
+        container_name: device-service
+        restart: unless-stopped
+        ports:
+            - 8300:80
+        environment:
+            - APACHE_RUN_USER=#1000
+            - APACHE_RUN_GROUP=#1000
+        volumes:
+            - ./device-service:/var/www/html
+        depends_on:
+            - adminpanel
+
+    auth-server:
+        image: phober-php_8.1-apache
+        container_name: auth-server
+        restart: unless-stopped
+        ports:
+            - 8500:80
+        environment:
+            - APACHE_RUN_USER=#1000
+            - APACHE_RUN_GROUP=#1000
+        volumes:
+            - ./auth-server:/var/www/html
+        depends_on:
+            - adminpanel
+
+volumes:
+    dbdata:
