@@ -28,6 +28,20 @@ services:
         ports:
             - 8900:80
 
+    config-server:
+        image: phober-php_8.1-apache
+        container_name: config-server
+        restart: unless-stopped
+        ports:
+            - 8700:80
+        environment:
+            - APACHE_RUN_USER=#1000
+            - APACHE_RUN_GROUP=#1000
+        volumes:
+            - ./config-server:/var/www/html
+        depends_on:
+            - db
+
     adminpanel:
 #        build:
 #            args:

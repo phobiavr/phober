@@ -7,3 +7,6 @@
 [submodule "device-service"]
 	path = device-service
 	url = https://github.com/phobiavr/phober-device-service.git
+[submodule "config-server"]
+	path = config-server
+	url = https://github.com/phobiavr/phober-config-server
