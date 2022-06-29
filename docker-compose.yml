@@ -2,14 +2,13 @@ version: "3.7"
 
 services:
     db:
+        platform: linux/x86_64
         image: mysql:8.0
         container_name: db
         environment:
             MYSQL_ROOT_PASSWORD: root
             SERVICE_TAGS: dev
             SERVICE_NAME: mysql
-        ports:
-            - 3306:3306
         volumes:
             - ./env/mysql:/docker-entrypoint-initdb.d
             - dbdata:/var/lib/mysql
@@ -17,6 +16,7 @@ services:
             - backend
 
     phpmyadmin:
+        platform: linux/x86_64
         image: phpmyadmin
         container_name: phpmyadmin
         links:
@@ -36,8 +36,6 @@ services:
         image: phober-php_8.1-apache
         container_name: config-server
         restart: unless-stopped
-        ports:
-            - 8700:80
         environment:
             - APACHE_RUN_USER=#1000
             - APACHE_RUN_GROUP=#1000
@@ -108,3 +106,5 @@ volumes:
 
 networks:
   backend:
+    name: phober_backend
+    driver: bridge
