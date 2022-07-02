@@ -13,3 +13,6 @@
 [submodule "website"]
 	path = website
 	url = https://github.com/phobiavr/website.git
+[submodule "old-website"]
+	path = old-website
+	url = https://github.com/phobiavr/old-website.git
