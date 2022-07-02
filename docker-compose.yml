@@ -112,7 +112,7 @@ services:
         ports:
             - 8080:80
         volumes:
-            - ./website:/usr/share/nginx/html
+            - ./old-website:/usr/share/nginx/html
         networks:
             - backend
             - frontend
