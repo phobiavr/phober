@@ -10,3 +10,6 @@
 [submodule "config-server"]
 	path = config-server
 	url = https://github.com/phobiavr/phober-config-server
+[submodule "website"]
+	path = website
+	url = https://github.com/phobiavr/website.git

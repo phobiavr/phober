@@ -101,10 +101,28 @@ services:
         networks:
             - backend
 
+    website:
+        build:
+            context: ./
+            dockerfile: ./env/phober-website/Dockerfile
+        image: phober-website
+        container_name: website
+        restart: unless-stopped
+        ports:
+            - 80:80
+        volumes:
+            - ./website:/usr/share/nginx/html
+        networks:
+            - backend
+            - frontend
+
 volumes:
     dbdata:
 
 networks:
   backend:
     name: phober_backend
+    driver: bridge
+  frontend:
+    name: phober_frontend
     driver: bridge
