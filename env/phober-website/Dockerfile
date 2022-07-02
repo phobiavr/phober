@@ -1,3 +1,7 @@
-FROM nginx:alpine
+FROM node:18.4.0-alpine
 
-COPY . /usr/share/nginx/html
+WORKDIR /app
+
+EXPOSE 3000
+
+CMD [ "npm", "start" ]
