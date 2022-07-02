@@ -103,6 +103,20 @@ services:
         networks:
             - backend
 
+    old-website:
+        build:
+            context: ./
+            dockerfile: ./env/phober-old-website/Dockerfile
+        image: phober-old-website
+        container_name: old-website
+        ports:
+            - 8080:80
+        volumes:
+            - ./website:/usr/share/nginx/html
+        networks:
+            - backend
+            - frontend
+
     website:
         build:
             context: ./
