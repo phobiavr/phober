@@ -16,3 +16,6 @@
 [submodule "old-website"]
 	path = old-website
 	url = https://github.com/phobiavr/old-website.git
+[submodule "notification-server"]
+	path = notification-server
+	url = https://github.com/phobiavr/phober-notification-server.git

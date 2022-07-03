@@ -59,7 +59,7 @@ services:
         container_name: adminpanel
         restart: unless-stopped
         ports:
-            - 8200:80
+            - 8100:80
         environment:
             - APACHE_RUN_USER=#1000
             - APACHE_RUN_GROUP=#1000
@@ -76,12 +76,28 @@ services:
         container_name: device-service
         restart: unless-stopped
         ports:
-            - 8300:80
+            - 8200:80
         environment:
             - APACHE_RUN_USER=#1000
             - APACHE_RUN_GROUP=#1000
         volumes:
             - ./device-service:/var/www/html
+        depends_on:
+            - adminpanel
+        networks:
+            - backend
+
+    notification-server:
+        image: phober-php_8.1-apache
+        container_name: notification-server
+        restart: unless-stopped
+        ports:
+            - 8888:80
+        environment:
+            - APACHE_RUN_USER=#1000
+            - APACHE_RUN_GROUP=#1000
+        volumes:
+            - ./notification-server:/var/www/html
         depends_on:
             - adminpanel
         networks:
@@ -110,7 +126,7 @@ services:
         image: phober-old-website
         container_name: old-website
         ports:
-            - 8080:80
+            - 80:80
         volumes:
             - ./old-website:/usr/share/nginx/html
         networks:
@@ -124,7 +140,7 @@ services:
         image: phober-website
         container_name: website
         ports:
-            - 80:3000
+            - 3030:3000
         volumes:
             - ./website:/app
         stdin_open: true
