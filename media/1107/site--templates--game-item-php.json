@@ -1,0 +1,21 @@
+{
+    "file": "site\/templates\/game-item.php",
+    "textdomain": "site--templates--game-item-php",
+    "translations": {
+        "fff5e646e6b9e074664f8ce30adcdad1": {
+            "text": "\u0416\u0430\u043d\u0440"
+        },
+        "87bd3f5db790439302185b10fc4adc6f": {
+            "text": "\u041a\u043e\u043b-\u0432\u043e \u0438\u0433\u0440\u043e\u043a\u043e\u0432"
+        },
+        "476b512d4dab80a66e01e3fec17a5d9a": {
+            "text": "\u0420\u0435\u0439\u0442\u0438\u043d\u0433"
+        },
+        "be8109e76332b4f3b0660d2c23bbc4cb": {
+            "text": "\u041f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u044e\u0449\u0438\u0435 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0430"
+        },
+        "b88c3cf5b35749d072aa02761b3d5fdb": {
+            "text": "\u0420\u0435\u0437\u0435\u0440\u0432\u0430\u0446\u0438\u044f"
+        }
+    }
+}

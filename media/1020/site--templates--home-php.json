@@ -1,0 +1,42 @@
+{
+    "file": "site\/templates\/home.php",
+    "textdomain": "site--templates--home-php",
+    "translations": {
+        "17a788856328605b18207c6a1f78b539": {
+            "text": "All games"
+        },
+        "b3a8e8fb9a4f419d59db87cda4934174": {
+            "text": "Details"
+        },
+        "b88c3cf5b35749d072aa02761b3d5fdb": {
+            "text": "Reservation"
+        },
+        "bd52c466ebcc49c7aba8e056481b2794": {
+            "text": "Learn More"
+        },
+        "e1ecdc0af55479f312e1c7dc643cc96a": {
+            "text": "All news"
+        },
+        "ae8e635ba74f42181e38c32b1e45092f": {
+            "text": "Name, Surname"
+        },
+        "de766e1a04fefc620196e4be06b31fb3": {
+            "text": "E-mail address"
+        },
+        "9e76df12dc9b2fb5448726e0a2fbc980": {
+            "text": "Contact number"
+        },
+        "72367d5993e78da852aae660b73825e6": {
+            "text": "Contact me"
+        },
+        "582aa0077a494c7a9574c9152851827d": {
+            "text": "* To register, you must fill in all fields"
+        },
+        "3f11bd2aa5609677cf3d659223b10428": {
+            "text": "Send"
+        },
+        "7880816d85ff8403511b2107da17cbe5": {
+            "text": "Other games"
+        }
+    }
+}

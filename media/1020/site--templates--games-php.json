@@ -1,0 +1,24 @@
+{
+    "file": "site\/templates\/games.php",
+    "textdomain": "site--templates--games-php",
+    "translations": {
+        "17a788856328605b18207c6a1f78b539": {
+            "text": "All games"
+        },
+        "fff5e646e6b9e074664f8ce30adcdad1": {
+            "text": "Genre"
+        },
+        "305319aafe40cc813d2cf42790127a23": {
+            "text": "Select Genre"
+        },
+        "87bd3f5db790439302185b10fc4adc6f": {
+            "text": "Number of players"
+        },
+        "26dab6b58679111dd8f59c68c1263e2b": {
+            "text": "Select a number"
+        },
+        "6ac944fdc75d171fbb1b8d3b5529653a": {
+            "text": "No results"
+        }
+    }
+}

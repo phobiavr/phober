@@ -1,0 +1,21 @@
+{
+    "file": "site\/templates\/game-item.php",
+    "textdomain": "site--templates--game-item-php",
+    "translations": {
+        "fff5e646e6b9e074664f8ce30adcdad1": {
+            "text": "Genre"
+        },
+        "87bd3f5db790439302185b10fc4adc6f": {
+            "text": "Number of players"
+        },
+        "476b512d4dab80a66e01e3fec17a5d9a": {
+            "text": "Rating"
+        },
+        "be8109e76332b4f3b0660d2c23bbc4cb": {
+            "text": "Supported Devices"
+        },
+        "b88c3cf5b35749d072aa02761b3d5fdb": {
+            "text": "Reservation"
+        }
+    }
+}
