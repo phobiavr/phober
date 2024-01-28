@@ -65,6 +65,8 @@ services:
             - APACHE_RUN_GROUP=#1000
         volumes:
             - ./adminpanel:/var/www/html
+            - ./media:/var/www/html/public/storage/media
+            - ~/.ssh:/home/user/.ssh
         depends_on:
             - db
             - phpmyadmin
