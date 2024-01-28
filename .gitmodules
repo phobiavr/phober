@@ -1,21 +1,21 @@
 [submodule "adminpanel"]
 	path = adminpanel
-	url = https://github.com/phobiavr/phober-adminpanel
+	url = git@github.com:phobiavr/phober-adminpanel.git
 [submodule "auth-server"]
 	path = auth-server
-	url = https://github.com/phobiavr/phober-auth-server
+	url = git@github.com:phobiavr/phober-auth-server.git
 [submodule "device-service"]
 	path = device-service
-	url = https://github.com/phobiavr/phober-device-service.git
+	url = git@github.com:phobiavr/phober-device-service.git
 [submodule "config-server"]
 	path = config-server
-	url = https://github.com/phobiavr/phober-config-server
+	url = git@github.com:phobiavr/phober-config-server.git
 [submodule "website"]
 	path = website
-	url = https://github.com/phobiavr/website.git
+	url = git@github.com:phobiavr/website.git
 [submodule "old-website"]
 	path = old-website
-	url = https://github.com/phobiavr/old-website.git
+	url = git@github.com:phobiavr/old-website.git
 [submodule "notification-server"]
 	path = notification-server
-	url = https://github.com/phobiavr/phober-notification-server.git
+	url = git@github.com:phobiavr/phober-notification-server.git
