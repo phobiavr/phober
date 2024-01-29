@@ -38,6 +38,8 @@ services:
         image: phober-php_8.1-apache
         container_name: config-server
         restart: unless-stopped
+        ports:
+            - 8700:80
         environment:
             - APACHE_RUN_USER=#1000
             - APACHE_RUN_GROUP=#1000
@@ -66,6 +68,7 @@ services:
         volumes:
             - ./adminpanel:/var/www/html
             - ./media:/var/www/html/public/storage/media
+            - ./media:/var/www/html/storage/app/public/media
             - ~/.ssh:/home/user/.ssh
         depends_on:
             - db
@@ -78,12 +81,14 @@ services:
         container_name: device-service
         restart: unless-stopped
         ports:
-            - 8200:80
+            - 8300:80
         environment:
             - APACHE_RUN_USER=#1000
             - APACHE_RUN_GROUP=#1000
         volumes:
             - ./device-service:/var/www/html
+            - ./media:/var/www/html/public/storage/media:ro
+            - ./media:/var/www/html/storage/app/public/media:ro
         depends_on:
             - adminpanel
         networks:
