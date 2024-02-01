@@ -78,10 +78,9 @@ services:
 
     device-service:
         image: phober-php_8.1-apache
-        container_name: device-service
         restart: unless-stopped
         ports:
-            - 8300:80
+            - "8300-8399:80"
         environment:
             - APACHE_RUN_USER=#1000
             - APACHE_RUN_GROUP=#1000
@@ -93,6 +92,8 @@ services:
             - adminpanel
         networks:
             - backend
+        deploy:
+            replicas: 3
 
     notification-server:
         image: phober-php_8.1-apache
@@ -126,37 +127,47 @@ services:
         networks:
             - backend
 
-    old-website:
-        build:
-            context: ./
-            dockerfile: ./env/phober-old-website/Dockerfile
-        image: phober-old-website
-        container_name: old-website
-        ports:
-            - 80:80
-        volumes:
-            - ./old-website:/usr/share/nginx/html
-        networks:
-            - backend
-            - frontend
+#    old-website:
+#        build:
+#            context: ./
+#            dockerfile: ./env/phober-old-website/Dockerfile
+#        image: phober-old-website
+#        container_name: old-website
+#        ports:
+#            - 80:80
+#        volumes:
+#            - ./old-website:/usr/share/nginx/html
+#        networks:
+#            - backend
+#            - frontend
+#
+#    website:
+#        build:
+#            context: ./
+#            dockerfile: ./env/phober-website/Dockerfile
+#        image: phober-website
+#        container_name: website
+#        ports:
+#            - 3030:3000
+#        volumes:
+#            - ./website:/app
+#        stdin_open: true
+#        environment:
+#            - CHOKIDAR_USEPOLLING=true
+#        command: npm run start
+#        networks:
+#            - backend
+#            - frontend
 
-    website:
-        build:
-            context: ./
-            dockerfile: ./env/phober-website/Dockerfile
-        image: phober-website
-        container_name: website
+    api-gateway:
+        image: nginx:latest
+        container_name: nginx
         ports:
-            - 3030:3000
+            - "8000:80"
         volumes:
-            - ./website:/app
-        stdin_open: true
-        environment:
-            - CHOKIDAR_USEPOLLING=true
-        command: npm run start
+            - ./env/nginx/nginx.conf:/etc/nginx/nginx.conf
         networks:
             - backend
-            - frontend
 
 volumes:
     dbdata:
