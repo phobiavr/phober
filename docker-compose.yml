@@ -168,6 +168,11 @@ services:
             - ./env/nginx/nginx.conf:/etc/nginx/nginx.conf
         networks:
             - backend
+        depends_on:
+            - config-server
+            - auth-server
+            - device-service
+            - notification-server
 
 volumes:
     dbdata:
