@@ -111,6 +111,21 @@ services:
         networks:
             - backend
 
+    notification-queue:
+        image: phober-php_8.1-apache
+        container_name: notification-queue
+        restart: always
+        command: php artisan queue:work
+        environment:
+            - APACHE_RUN_USER=#1000
+            - APACHE_RUN_GROUP=#1000
+        volumes:
+            - ./notification-server:/var/www/html
+        depends_on:
+            - notification-server
+        networks:
+            - backend
+
     auth-server:
         image: phober-php_8.1-apache
         container_name: auth-server
