@@ -108,7 +108,6 @@ services:
             - ./notification-server:/var/www/html
         depends_on:
             - adminpanel
-            -  rabbitmq
         networks:
             - backend
 
@@ -127,16 +126,6 @@ services:
             - adminpanel
         networks:
             - backend
-
-    rabbitmq:
-        image: "rabbitmq:3-management"
-        container_name: rabbitmq
-        environment:
-            RABBITMQ_DEFAULT_USER: "user"
-            RABBITMQ_DEFAULT_PASS: "password"
-        ports:
-            - "5672:5672"
-            - "15672:15672"
 
 #    old-website:
 #        build:
