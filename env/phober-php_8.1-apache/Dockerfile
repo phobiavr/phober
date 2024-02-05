@@ -6,7 +6,7 @@ LABEL maintainer="Hikmat Abdukhaligov"
 ARG user
 ARG uid
 
-# Install development packages and clean up apt cache.
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     curl \
     g++ \
@@ -23,36 +23,30 @@ RUN apt-get update && apt-get install -y \
     sudo \
     unzip \
     zip \
+ && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache sockets \
  && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
+# Configure Apache Document Root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+ && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# mod_rewrite for URL rewrite and mod_headers for .htaccess extra headers like Access-Control-Allow-Origin-
+# Enable Apache mod_rewrite and mod_headers
 RUN a2enmod rewrite headers
 
-# Start with base PHP config, then add extensions.
+# Use the default development configuration
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
-
-# Composer.
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# We need a user with the same UID/GID as the host user
-# so when we execute CLI commands, all the host file's permissions and ownership remain intact.
-# Otherwise commands from inside the container would create root-owned files and directories.
-# Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
+# Create a system user to run Composer and Artisan Commands
+RUN useradd -G www-data,root -u $uid -d /home/$user $user \
+ && mkdir -p /home/$user/.composer \
+ && chown -R $user:$user /home/$user
 
 # Set working directory
 WORKDIR /var/www/html
 
+# Switch to the created user
 USER $user
