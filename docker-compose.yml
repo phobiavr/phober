@@ -1,12 +1,21 @@
 version: "3.7"
 
+x-common-env: &common-env
+    APACHE_RUN_USER: www-data
+    APACHE_RUN_GROUP: www-data
+    APACHE_LOG_DIR: /var/log/apache2
+    APACHE_RUN_DIR: /var/run/apache2
+    APACHE_PID_FILE: /var/run/apache2/apache2.pid
+    APACHE_LOCK_DIR: /var/lock/apache2
+
+
 services:
     db:
         platform: linux/x86_64
         image: mysql:8.0
         container_name: db
         ports:
-            - 3306:3306
+            - "3306:3306"
         environment:
             MYSQL_ROOT_PASSWORD: root
             SERVICE_TAGS: dev
@@ -30,7 +39,7 @@ services:
             PMA_PORT: 3306
             PMA_ARBITRARY: 1
         ports:
-            - 8900:80
+            - "8900:80"
         networks:
             - backend
 
@@ -39,32 +48,29 @@ services:
         container_name: config-server
         restart: unless-stopped
         ports:
-            - 8700:80
+            - "8700:80"
         environment:
-            - APACHE_RUN_USER=#1000
-            - APACHE_RUN_GROUP=#1000
+            << : *common-env
         volumes:
             - ./config-server:/var/www/html
         depends_on:
+            - adminpanel
             - db
         networks:
             - backend
+        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'config-server' && apache2 -D FOREGROUND"
 
     adminpanel:
         build:
-            args:
-                user: user
-                uid: 1000
             context: ./
             dockerfile: ./env/phober-php_8.1-apache/Dockerfile
         image: phober-php_8.1-apache
         container_name: adminpanel
         restart: unless-stopped
         ports:
-            - 8100:80
+            - "8100:80"
         environment:
-            - APACHE_RUN_USER=#1000
-            - APACHE_RUN_GROUP=#1000
+            << : *common-env
         volumes:
             - ./adminpanel:/var/www/html
             - ./media:/var/www/html/public/storage/media
@@ -75,6 +81,7 @@ services:
             - phpmyadmin
         networks:
             - backend
+        entrypoint: sh -c "php /var/www/html/artisan migrate && php /var/www/html/artisan hostname:update 'adminpanel' && apache2 -D FOREGROUND"
 
     device-service:
         image: phober-php_8.1-apache
@@ -82,8 +89,7 @@ services:
         ports:
             - "8300-8399:80"
         environment:
-            - APACHE_RUN_USER=#1000
-            - APACHE_RUN_GROUP=#1000
+            << : *common-env
         volumes:
             - ./device-service:/var/www/html
             - ./media:/var/www/html/public/storage/media:ro
@@ -94,22 +100,23 @@ services:
             - backend
         deploy:
             replicas: 3
+        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
 
     notification-server:
         image: phober-php_8.1-apache
         container_name: notification-server
         restart: unless-stopped
         ports:
-            - 8888:80
+            - "8888:80"
         environment:
-            - APACHE_RUN_USER=#1000
-            - APACHE_RUN_GROUP=#1000
+            << : *common-env
         volumes:
             - ./notification-server:/var/www/html
         depends_on:
             - adminpanel
         networks:
             - backend
+        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'notification-server' && apache2 -D FOREGROUND"
 
     notification-queue:
         image: phober-php_8.1-apache
@@ -117,8 +124,7 @@ services:
         restart: always
         command: php artisan queue:work
         environment:
-            - APACHE_RUN_USER=#1000
-            - APACHE_RUN_GROUP=#1000
+            << : *common-env
         volumes:
             - ./notification-server:/var/www/html
         depends_on:
@@ -131,16 +137,16 @@ services:
         container_name: auth-server
         restart: unless-stopped
         ports:
-            - 8500:80
+            - "8500:80"
         environment:
-            - APACHE_RUN_USER=#1000
-            - APACHE_RUN_GROUP=#1000
+            << : *common-env
         volumes:
             - ./auth-server:/var/www/html
         depends_on:
             - adminpanel
         networks:
             - backend
+        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'auth-server' && apache2 -D FOREGROUND"
 
 #    old-website:
 #        build:
