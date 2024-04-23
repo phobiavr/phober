@@ -46,7 +46,6 @@ services:
     config-server:
         image: phober-php_8.1-apache
         container_name: config-server
-        restart: unless-stopped
         ports:
             - "8700:80"
         environment:
@@ -55,10 +54,9 @@ services:
             - ./config-server:/var/www/html
         depends_on:
             - adminpanel
-            - db
         networks:
             - backend
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'config-server' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan hostname:update 'config-server' && apache2 -D FOREGROUND"
 
     adminpanel:
         build:
@@ -66,7 +64,6 @@ services:
             dockerfile: ./env/phober-php_8.1-apache/Dockerfile
         image: phober-php_8.1-apache
         container_name: adminpanel
-        restart: unless-stopped
         ports:
             - "8100:80"
         environment:
@@ -76,16 +73,15 @@ services:
             - ./media:/var/www/html/public/storage/media
             - ./media:/var/www/html/storage/app/public/media
             - ~/.ssh:/home/user/.ssh
+            - ~/.config/composer:/home/user/.composer
         depends_on:
             - db
-            - phpmyadmin
         networks:
             - backend
-        entrypoint: sh -c "php /var/www/html/artisan migrate && php /var/www/html/artisan hostname:update 'adminpanel' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan migrate && php /var/www/html/artisan hostname:update 'adminpanel' && apache2 -D FOREGROUND"
 
     device-service:
         image: phober-php_8.1-apache
-        restart: unless-stopped
         ports:
             - "8300-8399:80"
         environment:
@@ -95,17 +91,17 @@ services:
             - ./media:/var/www/html/public/storage/media:ro
             - ./media:/var/www/html/storage/app/public/media:ro
         depends_on:
+            - config-server
             - adminpanel
         networks:
             - backend
         deploy:
             replicas: 3
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan config-client:update && php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
 
     notification-server:
         image: phober-php_8.1-apache
         container_name: notification-server
-        restart: unless-stopped
         ports:
             - "8888:80"
         environment:
@@ -113,15 +109,15 @@ services:
         volumes:
             - ./notification-server:/var/www/html
         depends_on:
+            - config-server
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'notification-server' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan config-client:update && php /var/www/html/artisan hostname:update 'notification-server' && apache2 -D FOREGROUND"
 
     notification-queue:
         image: phober-php_8.1-apache
         container_name: notification-queue
-        restart: always
         command: php artisan queue:work
         environment:
             << : *common-env
@@ -135,7 +131,6 @@ services:
     auth-server:
         image: phober-php_8.1-apache
         container_name: auth-server
-        restart: unless-stopped
         ports:
             - "8500:80"
         environment:
@@ -143,42 +138,43 @@ services:
         volumes:
             - ./auth-server:/var/www/html
         depends_on:
+            - config-server
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'auth-server' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "php /var/www/html/artisan config-client:update && php /var/www/html/artisan hostname:update 'auth-server' && apache2 -D FOREGROUND"
 
-#    old-website:
-#        build:
-#            context: ./
-#            dockerfile: ./env/phober-old-website/Dockerfile
-#        image: phober-old-website
-#        container_name: old-website
-#        ports:
-#            - 80:80
-#        volumes:
-#            - ./old-website:/usr/share/nginx/html
-#        networks:
-#            - backend
-#            - frontend
-#
-#    website:
-#        build:
-#            context: ./
-#            dockerfile: ./env/phober-website/Dockerfile
-#        image: phober-website
-#        container_name: website
-#        ports:
-#            - 3030:3000
-#        volumes:
-#            - ./website:/app
-#        stdin_open: true
-#        environment:
-#            - CHOKIDAR_USEPOLLING=true
-#        command: npm run start
-#        networks:
-#            - backend
-#            - frontend
+    #old-website:
+    #    build:
+    #        context: ./
+    #        dockerfile: ./env/phober-old-website/Dockerfile
+    #    image: phober-old-website
+    #    container_name: old-website
+    #    ports:
+    #        - 80:80
+    #    volumes:
+    #        - ./old-website:/usr/share/nginx/html
+    #    networks:
+    #        - backend
+    #        - frontend
+
+    #website:
+    #    build:
+    #        context: ./
+    #        dockerfile: ./env/phober-website/Dockerfile
+    #    image: phober-website
+    #    container_name: website
+    #    ports:
+    #        - 3030:3000
+    #    volumes:
+    #        - ./website:/app
+    #    stdin_open: true
+    #    environment:
+    #        - CHOKIDAR_USEPOLLING=true
+    #    command: npm run start
+    #    networks:
+    #        - backend
+    #        - frontend
 
     api-gateway:
         image: nginx:latest
