@@ -56,7 +56,7 @@ services:
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan hostname:update 'config-server' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "apache2 -D FOREGROUND"
 
     adminpanel:
         build:
@@ -78,7 +78,7 @@ services:
             - db
         networks:
             - backend
-        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan migrate && php /var/www/html/artisan hostname:update 'adminpanel' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "apache2 -D FOREGROUND"
 
     device-service:
         image: phober-php_8.1-apache
@@ -97,7 +97,7 @@ services:
             - backend
         deploy:
             replicas: 3
-        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan config-client:update && php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "apache2 -D FOREGROUND"
 
     notification-server:
         image: phober-php_8.1-apache
@@ -113,7 +113,7 @@ services:
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "composer install --ignore-platform-reqs && php /var/www/html/artisan config-client:update && php /var/www/html/artisan hostname:update 'notification-server' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "apache2 -D FOREGROUND"
 
     notification-queue:
         image: phober-php_8.1-apache
@@ -142,7 +142,7 @@ services:
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "php /var/www/html/artisan config-client:update && php /var/www/html/artisan hostname:update 'auth-server' && apache2 -D FOREGROUND"
+        entrypoint: sh -c "apache2 -D FOREGROUND"
 
     #old-website:
     #    build:
@@ -195,9 +195,9 @@ volumes:
     dbdata:
 
 networks:
-  backend:
-    name: phober_backend
-    driver: bridge
-  frontend:
-    name: phober_frontend
-    driver: bridge
+    backend:
+        name: phober_backend
+        driver: bridge
+    frontend:
+        name: phober_frontend
+        driver: bridge
