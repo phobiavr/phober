@@ -42,21 +42,6 @@ services:
         networks:
             - backend
 
-    config-server:
-        image: phober-php_8.1-apache
-        container_name: config-server
-        ports:
-            - "8700:80"
-        environment:
-            << : *common-env
-        volumes:
-            - ./config-server:/var/www/html
-        depends_on:
-            - adminpanel
-        networks:
-            - backend
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-
     adminpanel:
         build:
             context: ./
@@ -73,12 +58,31 @@ services:
             - ./media:/var/www/html/public/storage/media
             - ./media:/var/www/html/storage/app/public/media
             - ~/.ssh:/home/user/.ssh
-            - ~/.config/composer:/home/user/.composer
+            - ~/.config/composer:/root/.composer
         depends_on:
             - db
         networks:
             - backend
-        entrypoint: sh -c "apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
+            php /var/www/html/artisan migrate &&
+            apache2 -D FOREGROUND"
+
+    config-server:
+        image: phober-php_8.1-apache
+        container_name: config-server
+        ports:
+            - "8700:80"
+        environment:
+            << : *common-env
+        volumes:
+            - ./config-server:/var/www/html
+        depends_on:
+            - adminpanel
+        networks:
+            - backend
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
+            php /var/www/html/artisan hostname:update 'config-server' &&
+            apache2 -D FOREGROUND"
 
     device-service:
         image: phober-php_8.1-apache
@@ -98,7 +102,10 @@ services:
             - backend
         deploy:
             replicas: 3
-        entrypoint: sh -c "apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
+            php /var/www/html/artisan config-client:update &&
+            php /var/www/html/artisan hostname:update 'device-service' &&
+            apache2 -D FOREGROUND"
 
     notification-server:
         image: phober-php_8.1-apache
@@ -114,7 +121,10 @@ services:
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
+            php /var/www/html/artisan config-client:update &&
+            php /var/www/html/artisan hostname:update 'notification-server' &&
+            apache2 -D FOREGROUND"
 
     notification-queue:
         image: phober-php_8.1-apache
@@ -143,7 +153,25 @@ services:
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
+            php /var/www/html/artisan config-client:update &&
+            php /var/www/html/artisan hostname:update 'auth-server' &&
+            apache2 -D FOREGROUND"
+
+    api-gateway:
+        image: nginx:latest
+        container_name: api-gateway
+        ports:
+            - "8000:80"
+        volumes:
+            - ./env/api-gateway/nginx.conf:/etc/nginx/nginx.conf
+        networks:
+            - backend
+        depends_on:
+            - config-server
+            - auth-server
+            - device-service
+            - notification-server
 
     #old-website:
     #    build:
@@ -176,21 +204,6 @@ services:
     #    networks:
     #        - backend
     #        - frontend
-
-    api-gateway:
-        image: nginx:latest
-        container_name: api-gateway
-        ports:
-            - "8000:80"
-        volumes:
-            - ./env/api-gateway/nginx.conf:/etc/nginx/nginx.conf
-        networks:
-            - backend
-        depends_on:
-            - config-server
-            - auth-server
-            - device-service
-            - notification-server
 
 volumes:
     dbdata:
