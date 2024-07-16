@@ -1,13 +1,12 @@
 version: "3.7"
 
 x-common-env: &common-env
-    APACHE_RUN_USER: www-data
-    APACHE_RUN_GROUP: www-data
+    APACHE_RUN_USER: "#1000"
+    APACHE_RUN_GROUP: "#1000"
     APACHE_LOG_DIR: /var/log/apache2
     APACHE_RUN_DIR: /var/run/apache2
     APACHE_PID_FILE: /var/run/apache2/apache2.pid
     APACHE_LOCK_DIR: /var/lock/apache2
-
 
 services:
     db:
@@ -68,6 +67,7 @@ services:
             - "8100:80"
         environment:
             << : *common-env
+            APP_URL: "http://localhost:8100"
         volumes:
             - ./adminpanel:/var/www/html
             - ./media:/var/www/html/public/storage/media
@@ -86,6 +86,7 @@ services:
             - "8300-8399:80"
         environment:
             << : *common-env
+            APP_URL: "http://localhost:8000/hardware"
         volumes:
             - ./device-service:/var/www/html
             - ./media:/var/www/html/public/storage/media:ro
