@@ -5,11 +5,9 @@
 ## Table of Contents
 
 - [Technologies](#technologies)
-- [Introduction](#introduction---service-definitions)
+- [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
-
----
 
 ## Technologies
 
@@ -18,11 +16,9 @@
 - MySQL
 - Docker & Docker Compose
 
----
-
 ## Introduction
 
-### <center>Adminpanel</center>
+### <p align="center">Adminpanel</p>
 
 The `adminpanel` service within the `phober` project is crucial for managing administrative tasks, user interfaces, and updating various databases and configurations. It interacts with the following databases:
 
@@ -50,7 +46,7 @@ The `adminpanel` service within the `phober` project is crucial for managing adm
 - Requires seeding the database with initial data.
 - Utilizes an `auth.json` file for downloading dependencies such as `laravel/nova`.
 
-### <center>Config-server</center>
+### <p align="center">Config-server</p>
 
 The `config-server` service within the `phober` project serves as a repository dedicated to storing configuration data crucial for the application's operation.
 
@@ -75,7 +71,7 @@ The `config-server` service within the `phober` project serves as a repository d
 - Utilizes the `laravel-config-server-client` package (available at [GitHub](https://github.com/Abdukhaligov/laravel-config-server-client) and [Packagist](https://packagist.org/packages/abdukhaligov/laravel-config-server-client)) for configuration management commands.
 - Configuration values are retrieved from `.env` files, Docker environment variables, or the `phober_config` database managed by the `adminpanel`.
 
-### <center>Notification-server</center>
+### <p align="center">Notification-server</p>
 
 The `notification-server` service within the `phober` project manages the sending of various notifications such as emails, OTPs, and support messages. It integrates with communication platforms like Discord and Telegram. This service also includes a `notification-queue` component in Docker Compose, enabling asynchronous message handling through job queues to optimize responsiveness.
 
@@ -91,7 +87,7 @@ The `notification-server` service within the `phober` project manages the sendin
 - Enhances message delivery efficiency using job queues within the Docker environment.
 - Integrates with various communication platforms for versatile notification capabilities.
 
-### <center>Device-service</center>
+### <p align="center">Device-service</p>
 
 The `device-service` within the `phober` project focuses on displaying hardware-related data, device configurations, and game information.
 
@@ -107,7 +103,7 @@ The `device-service` within the `phober` project focuses on displaying hardware-
 - Utilizes multiple instances (`replicas: 3`) for redundancy but does not function as a load balancer.
 - Provides an interface to view hardware-related data within the application environment.
 
-### <center>Auth-server</center>
+### <p align="center">Auth-server</p>
 
 The `auth-server` within the `phober` project manages authentication and authorization functionalities using the `phober_auth` database for user authentication.
 
@@ -124,7 +120,7 @@ The `auth-server` within the `phober` project manages authentication and authori
 
 Certainly! Here's how you can structure the `Api-Gateway` section in your README file to include responsibilities, dependencies, and additional details:
 
-### <center>API Gateway</center>
+### <p align="center">API Gateway</p>
 
 The `Api-Gateway` simplifies client-side interactions by providing a single entry point to access multiple backend services. It abstracts the complexity of service locations and configurations, enhancing application scalability and management.
 
@@ -135,7 +131,7 @@ The `Api-Gateway` simplifies client-side interactions by providing a single entr
 
 **Note:** Refer to the provided Nginx configuration file (`env/api-gateway/nginx.conf`) for detailed setup and routing rules.
 
-### <center>Media</center>
+### <p align="center">Media</p>
 
 The `Media` folder within our repository serves as a centralized repository for storing and managing files, similar to an S3 bucket but located locally. It plays a crucial role in our application for organizing and accessing media files efficiently.
 
@@ -146,8 +142,6 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 - **Adminpanel:** Utilizes the `Media` folder for managing and storing files. It has full read-write access to the folder, enabling comprehensive file management capabilities.
 
 - **Device-service:** Accesses the `Media` folder in a read-only mode. This service retrieves and displays media files managed by the `Adminpanel` without modifying them.
-
----
 
 ## Installation
 
@@ -223,9 +217,4 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    
    This command updates each service's configuration based on dynamic values from the `config-server`.
 
----
-
 ## Usage
-
----
-
