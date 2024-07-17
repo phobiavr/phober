@@ -55,7 +55,7 @@ services:
             << : *common-env
         volumes:
             - ./device-service:/var/www/html
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     notification-server:
         image: phober-php_8.1-apache
