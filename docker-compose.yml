@@ -20,7 +20,6 @@ services:
             SERVICE_TAGS: dev
             SERVICE_NAME: mysql
         volumes:
-            - ./env/mysql:/docker-entrypoint-initdb.d
             - dbdata:/var/lib/mysql
         networks:
             - backend
@@ -57,15 +56,11 @@ services:
             - ./adminpanel:/var/www/html
             - ./media:/var/www/html/public/storage/media
             - ./media:/var/www/html/storage/app/public/media
-            - ~/.ssh:/home/user/.ssh
-            - ~/.config/composer:/root/.composer
         depends_on:
             - db
         networks:
             - backend
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
-            php /var/www/html/artisan migrate &&
-            apache2 -D FOREGROUND"
+        entrypoint: sh -c "apache2 -D FOREGROUND"
 
     config-server:
         image: phober-php_8.1-apache
@@ -77,12 +72,11 @@ services:
         volumes:
             - ./config-server:/var/www/html
         depends_on:
+            - db
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
-            php /var/www/html/artisan hostname:update 'config-server' &&
-            apache2 -D FOREGROUND"
+        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'config-server' && apache2 -D FOREGROUND"
 
     device-service:
         image: phober-php_8.1-apache
@@ -102,8 +96,7 @@ services:
             - backend
         deploy:
             replicas: 3
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
-            php /var/www/html/artisan config-client:update &&
+        entrypoint: sh -c "php /var/www/html/artisan config-client:update &&
             php /var/www/html/artisan hostname:update 'device-service' &&
             apache2 -D FOREGROUND"
 
@@ -121,8 +114,7 @@ services:
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
-            php /var/www/html/artisan config-client:update &&
+        entrypoint: sh -c "php /var/www/html/artisan config-client:update &&
             php /var/www/html/artisan hostname:update 'notification-server' &&
             apache2 -D FOREGROUND"
 
@@ -153,8 +145,7 @@ services:
             - adminpanel
         networks:
             - backend
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
-            php /var/www/html/artisan config-client:update &&
+        entrypoint: sh -c "php /var/www/html/artisan config-client:update &&
             php /var/www/html/artisan hostname:update 'auth-server' &&
             apache2 -D FOREGROUND"
 
