@@ -1,0 +1,79 @@
+version: "3.7"
+
+x-common-env: &common-env
+    APACHE_RUN_USER: "#1000"
+    APACHE_RUN_GROUP: "#1000"
+    APACHE_LOG_DIR: /var/log/apache2
+    APACHE_RUN_DIR: /var/run/apache2
+    APACHE_PID_FILE: /var/run/apache2/apache2.pid
+    APACHE_LOCK_DIR: /var/lock/apache2
+
+services:
+    db:
+        platform: linux/x86_64
+        image: mysql:8.0
+        container_name: db
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - ./env/mysql:/docker-entrypoint-initdb.d
+            - dbdata:/var/lib/mysql
+
+    adminpanel:
+        build:
+            context: ./
+            dockerfile: ./env/phober-php_8.1-apache/Dockerfile
+        image: phober-php_8.1-apache
+        container_name: adminpanel
+        environment:
+            << : *common-env
+        volumes:
+            - ./adminpanel:/var/www/html
+            - ~/.ssh:/home/user/.ssh
+            - ~/.config/composer:/root/.composer
+        depends_on:
+            - db
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
+            php /var/www/html/artisan migrate --seed"
+
+    config-server:
+        image: phober-php_8.1-apache
+        container_name: config-server
+        environment:
+            << : *common-env
+        volumes:
+            - ./config-server:/var/www/html
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+
+    device-service:
+        image: phober-php_8.1-apache
+        environment:
+            << : *common-env
+        volumes:
+            - ./device-service:/var/www/html
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+
+    notification-server:
+        image: phober-php_8.1-apache
+        container_name: notification-server
+        environment:
+            << : *common-env
+        volumes:
+            - ./notification-server:/var/www/html
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+
+    auth-server:
+        image: phober-php_8.1-apache
+        container_name: auth-server
+        environment:
+            << : *common-env
+        volumes:
+            - ./auth-server:/var/www/html
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+
+volumes:
+    dbdata:
