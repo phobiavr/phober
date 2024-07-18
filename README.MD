@@ -14,7 +14,7 @@
   - [API Gateway](#p-aligncenterapi-gatewayp)
   - [Media](#p-aligncentermediap)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Postman Collection](#postman-collection)
 
 ## Technologies
 
@@ -25,9 +25,11 @@
 
 ## Introduction
 
+<p>Welcome to the <b>Phober</b> project! This repository contains multiple microservices, each responsible for different aspects of the application. To understand each submodule deeply, please refer to their respective README files located in their directories.</p>
+
 ### <p align="center">Adminpanel</p>
 
-The `adminpanel` service within the `phober` project is crucial for managing administrative tasks, user interfaces, and updating various databases and configurations. It interacts with the following databases:
+The `adminpanel` service within the <b>Phober</b> project is crucial for managing administrative tasks, user interfaces, and updating various databases and configurations. It interacts with the following databases:
 
 - **`phober_adminpanel`**: Stores administrative data related to the admin panel interface.
 - **`phober_auth`**: Manages authentication and authorization data.
@@ -55,7 +57,7 @@ The `adminpanel` service within the `phober` project is crucial for managing adm
 
 ### <p align="center">Config-server</p>
 
-The `config-server` service within the `phober` project serves as a repository dedicated to storing configuration data crucial for the application's operation.
+The `config-server` service within the <b>Phober</b> project serves as a repository dedicated to storing configuration data crucial for the application's operation.
 
 #### Responsibilities:
 - Stores essential configuration data required for various aspects of the application.
@@ -80,7 +82,7 @@ The `config-server` service within the `phober` project serves as a repository d
 
 ### <p align="center">Notification-server</p>
 
-The `notification-server` service within the `phober` project manages the sending of various notifications such as emails, OTPs, and support messages. It integrates with communication platforms like Discord and Telegram. This service also includes a `notification-queue` component in Docker Compose, enabling asynchronous message handling through job queues to optimize responsiveness.
+The `notification-server` service within the <b>Phober</b> project manages the sending of various notifications such as emails, OTPs, and support messages. It integrates with communication platforms like Discord and Telegram. This service also includes a `notification-queue` component in Docker Compose, enabling asynchronous message handling through job queues to optimize responsiveness.
 
 #### Responsibilities:
 - Sends emails, OTPs, and support messages via Discord, Telegram, etc.
@@ -107,7 +109,7 @@ The following environment variables can be configured via the `.env` file inside
 
 ### <p align="center">Device-service</p>
 
-The `device-service` within the `phober` project focuses on displaying hardware-related data, device configurations, and game information.
+The `device-service` within the <b>Phober</b> project focuses on displaying hardware-related data, device configurations, and game information.
 
 #### Responsibilities:
 - Displays hardware data, device configurations, and game information.
@@ -123,7 +125,7 @@ The `device-service` within the `phober` project focuses on displaying hardware-
 
 ### <p align="center">Auth-server</p>
 
-The `auth-server` within the `phober` project manages authentication and authorization functionalities using the `phober_auth` database for user authentication.
+The `auth-server` within the <b>Phober</b> project manages authentication and authorization functionalities using the `phober_auth` database for user authentication.
 
 #### Responsibilities:
 - Handles user authentication and authorization processes.
@@ -263,4 +265,10 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
     ***Note:*** Some containers like `api-gateway` and `config-server` or `notification-server` might not run sometimes. If this happens, try to start them by running this command again:
 
-## Usage
+## Postman Collection
+
+<p>To help you get started with the <b>Phober</b> project, I've prepared a Postman collection that includes all the necessary API endpoints. This collection will allow you to easily test and interact with the different microservices within the project.</p>
+
+<p>The collection is organized by service, with each folder representing a different microservice. Inside each folder, you'll find all the relevant API endpoints along with example requests and responses.</p>
+
+[Phober.postman_collection.json](Phober.postman_collection.json)

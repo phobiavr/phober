@@ -1,0 +1,627 @@
+{
+	"info": {
+		"_postman_id": "93952d2b-9b22-45d9-b750-f487adc01995",
+		"name": "Phober",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10880785",
+		"_collection_link": "https://www.postman.com/abdukhaligov/workspace/phober-v1-0/collection/10880785-93952d2b-9b22-45d9-b750-f487adc01995?action=share&source=collection_link&creator=10880785"
+	},
+	"item": [
+		{
+			"name": "Auth Server",
+			"item": [
+				{
+					"name": "Get token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"if(response.token) {",
+									"    pm.environment.set('bearerToken', response.token);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@site.com\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/authenticate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check authentication validity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/valid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"valid"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notification Server",
+			"item": [
+				{
+					"name": "Generate OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"service1-test@gmail.com\",\n    \"digits\": 6,\n    \"validity\": 10\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/notification/otp/generate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notification",
+								"otp",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"service1-test@gmail.com\",\n    \"token\": \"KYKBZ3\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/notification/otp/validate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notification",
+								"otp",
+								"validate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send message to support",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"Subject\",\n    \"message\": \"Message\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/notification/support/message",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notification",
+								"support",
+								"message"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"Subject\",\n    \"message\": \"Message\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/notification/test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notification",
+								"test"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Config Server (private)",
+			"item": [
+				{
+					"name": "Get data",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/configs/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"configs",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Device Service",
+			"item": [
+				{
+					"name": "search (deprecated)",
+					"item": [
+						{
+							"name": "Get Multiplayer Games",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/hardware/games/search/multiplayer?size=10&page=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"hardware",
+										"games",
+										"search",
+										"multiplayer"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Games by Genre slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/hardware/games/search/by-genre/:genre?size=10&page=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"hardware",
+										"games",
+										"search",
+										"by-genre",
+										":genre"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									],
+									"variable": [
+										{
+											"key": "genre",
+											"value": "horror",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Games by Device slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/hardware/games/search/by-device/:device?size=10&page=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"hardware",
+										"games",
+										"search",
+										"by-device",
+										":device"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									],
+									"variable": [
+										{
+											"key": "device",
+											"value": "htc-vive",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Games by Rating Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/hardware/games/search/by-rating/:rating?size=10&page=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"hardware",
+										"games",
+										"search",
+										"by-rating",
+										":rating"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									],
+									"variable": [
+										{
+											"key": "rating",
+											"value": "5",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Search Games",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"device\": \"ps-vr\",\r\n    \"genre\": \"racing\",\r\n    \"multiplayer\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hardware/games/search?size=10&page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"games",
+								"search"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Games",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/games?size=10&page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"games"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Game by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/games/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"games",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Devices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/devices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"devices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Genres",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/genres",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"genres"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Instance Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/instance-info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"instance-info"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test Nginx",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/test",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"test"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
