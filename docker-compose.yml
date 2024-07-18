@@ -73,7 +73,6 @@ services:
             - ./config-server:/var/www/html
         depends_on:
             - db
-            - adminpanel
         networks:
             - backend
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'config-server' && apache2 -D FOREGROUND"
@@ -89,9 +88,6 @@ services:
             - ./device-service:/var/www/html
             - ./media:/var/www/html/public/storage/media:ro
             - ./media:/var/www/html/storage/app/public/media:ro
-        depends_on:
-            - config-server
-            - adminpanel
         networks:
             - backend
         deploy:
@@ -108,8 +104,7 @@ services:
         volumes:
             - ./notification-server:/var/www/html
         depends_on:
-            - config-server
-            - adminpanel
+            - db
         networks:
             - backend
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'notification-server' && apache2 -D FOREGROUND"
@@ -136,8 +131,6 @@ services:
             << : *common-env
         volumes:
             - ./auth-server:/var/www/html
-        depends_on:
-            - config-server
         networks:
             - backend
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'auth-server' && apache2 -D FOREGROUND"
@@ -152,7 +145,6 @@ services:
         networks:
             - backend
         depends_on:
-            - config-server
             - auth-server
             - device-service
             - notification-server
@@ -196,6 +188,6 @@ networks:
     backend:
         name: phober_backend
         driver: bridge
-    frontend:
-        name: phober_frontend
-        driver: bridge
+#    frontend:
+#        name: phober_frontend
+#        driver: bridge
