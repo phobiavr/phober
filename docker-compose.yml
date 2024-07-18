@@ -65,8 +65,8 @@ services:
     config-server:
         image: phober-php_8.1-apache
         container_name: config-server
-        ports:
-            - "8700:80"
+#        ports:
+#            - "8700:80"
         environment:
             << : *common-env
         volumes:
