@@ -267,4 +267,6 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
 <p>The collection is organized by service, with each folder representing a different microservice. Inside each folder, you'll find all the relevant API endpoints along with example requests and responses.</p>
 
+***Note:*** Make sure to set the `{{baseUrl}}` variable in your Postman environment to point to the `api-gateway` URL, as it serves as the base URL for all the endpoints.
+
 [Phober.postman_collection.json](Phober.postman_collection.json)
