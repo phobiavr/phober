@@ -1,7 +1,3 @@
-# Phober
-
-![Laravel](https://img.shields.io/badge/Laravel-v9.2-red)
-
 ## Table of Contents
 
 - [Technologies](#technologies)
