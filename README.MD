@@ -261,4 +261,6 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     docker-compose up -d
     ```
 
+    ***Note:*** Some containers like `api-gateway` and `config-server` or `notification-server` might not run sometimes. If this happens, try to start them by running this command again:
+
 ## Usage

@@ -88,6 +88,8 @@ services:
             - ./device-service:/var/www/html
             - ./media:/var/www/html/public/storage/media:ro
             - ./media:/var/www/html/storage/app/public/media:ro
+        depends_on:
+            - db
         networks:
             - backend
         deploy:
@@ -131,6 +133,8 @@ services:
             << : *common-env
         volumes:
             - ./auth-server:/var/www/html
+        depends_on:
+            - db
         networks:
             - backend
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'auth-server' && apache2 -D FOREGROUND"
