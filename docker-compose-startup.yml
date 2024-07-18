@@ -34,11 +34,13 @@ services:
         volumes:
             - ./adminpanel:/var/www/html
             - ~/.ssh:/home/user/.ssh
-            - ~/.config/composer:/root/.composer
+            - type: bind
+              source: ./auth.json
+              target: /root/.composer/auth.json
         depends_on:
             - db
         entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
-            php /var/www/html/artisan migrate --seed"
+            php /var/www/html/artisan migrate --seed && apache2 -D FOREGROUND"
 
     config-server:
         image: phober-php_8.1-apache
@@ -47,7 +49,7 @@ services:
             << : *common-env
         volumes:
             - ./config-server:/var/www/html
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     device-service:
         image: phober-php_8.1-apache
@@ -64,7 +66,7 @@ services:
             << : *common-env
         volumes:
             - ./notification-server:/var/www/html
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     auth-server:
         image: phober-php_8.1-apache
@@ -73,7 +75,7 @@ services:
             << : *common-env
         volumes:
             - ./auth-server:/var/www/html
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
 volumes:
     dbdata:

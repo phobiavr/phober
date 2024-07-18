@@ -6,6 +6,13 @@
 
 - [Technologies](#technologies)
 - [Introduction](#introduction)
+  - [Adminpanel](#p-aligncenteradminpanelp)
+  - [Config Server](#p-aligncenterconfig-serverp)
+  - [Notification Server](#p-aligncenternotification-serverp)
+  - [Device Service](#p-aligncenterdevice-servicep)
+  - [Auth Server](#p-aligncenterauth-serverp)
+  - [API Gateway](#p-aligncenterapi-gatewayp)
+  - [Media](#p-aligncentermediap)
 - [Installation](#installation)
 - [Usage](#usage)
 
@@ -172,7 +179,11 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     cp auth-server/.env.example auth-server/.env
     ```
 
-4. Ensure you have the `auth.json` file configured in your `~/.config/composer` directory:
+4. Ensure you have the `auth.json` file configured in your project directory:
+    ```bash
+    cp auth.json.example auth.json
+    ```
+
     ```json
     {
         "github-oauth": {
@@ -181,7 +192,14 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     }
     ```
 
+   You can create this file by copying the `auth.json.example` template provided in the project directory and then adding your GitHub credentials.
+   <br/>
+   <br/>
+   For guidance on creating a GitHub personal access token, refer to [this guide](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+   <br/>
+   <br/>
    ***Note:*** This is required to download the `laravel/nova` package.
+
 
 5. Build and start the Docker containers using the startup configuration:
     ```bash
@@ -192,15 +210,12 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
    - Runs `composer install` to install PHP dependencies for all services.
    - Executes `php artisan migrate --seed` for the `adminpanel` service, seeding the database with initial data.
-
+    
+   <br/>
    After this step, you'll have the core dependencies installed and your database populated with initial data for the adminpanel.
 
-6. After initial setup, you can start the full application stack:
-    ```bash
-    docker-compose up -d
-    ```
 
-7. Generate the application keys for the `config-server` and `adminpanel`:
+6. Generate the application keys for the `config-server` and `adminpanel`:
     ```bash
     docker-compose exec config-server php artisan key:generate
     docker-compose exec adminpanel php artisan key:generate
@@ -208,13 +223,25 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
    **Note:** The `config-server` is a microservice where dynamic environment values are stored. These values can come from Docker environment variables, `.env` file, or the database, with the database having the highest priority.
 
-8. Run the `config-client:update` command for specific services:
+
+7. Run the `config-client:update` command for specific services:
     ```bash
     docker-compose exec notification-server php /var/www/html/artisan config-client:update
     docker-compose exec auth-server php /var/www/html/artisan config-client:update
     docker-compose exec device-service php /var/www/html/artisan config-client:update
     ```
-   
+
    This command updates each service's configuration based on dynamic values from the `config-server`.
+
+
+8. Shut down all Docker containers after the initial setup:
+    ```bash
+    docker-compose down
+    ```
+
+9. Start the full application stack:
+    ```bash
+    docker-compose up -d
+    ```
 
 ## Usage
