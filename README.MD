@@ -90,6 +90,17 @@ The `notification-server` service within the `phober` project manages the sendin
 - Depends on the `config-server` and `adminpanel` services for configuration and data management.
 - Utilizes the `phober_notification` database for data operations.
 
+#### Environment Variables
+
+The following environment variables can be configured via the `.env` file inside the notification-server directory or provided through Docker Compose:
+
+ - `DISCORD_TOKEN`: The token for authenticating with the Discord API.
+ - `DISCORD_SUPPORT_CHANNEL`: The channel ID for support messages in Discord.
+ - `DISCORD_OTP_CHANNEL`: The channel ID for OTP messages in Discord.
+ - `TELEGRAM_BOT_TOKEN`: The token for authenticating with the Telegram Bot API.
+ - `TELEGRAM_OTP_CHANNEL`: The channel ID for OTP messages in Telegram.
+ - `TELEGRAM_SUPPORT_CHANNEL`: The channel ID for support messages in Telegram.
+
 #### Additional Details:
 - Enhances message delivery efficiency using job queues within the Docker environment.
 - Integrates with various communication platforms for versatile notification capabilities.
@@ -234,12 +245,18 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    This command updates each service's configuration based on dynamic values from the `config-server`.
 
 
-8. Shut down all Docker containers after the initial setup:
+8. Run the `storage:link` command for the adminpanel and device-service:
+    ```bash
+    docker-compose exec adminpanel php artisan storage:link
+    docker-compose exec device-service php artisan storage:link
+    ```
+
+9. Shut down all Docker containers after the initial setup:
     ```bash
     docker-compose down
     ```
 
-9. Start the full application stack:
+10. Start the full application stack:
     ```bash
     docker-compose up -d
     ```
