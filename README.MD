@@ -219,6 +219,7 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    This step initializes the Docker containers according to the startup configuration and automatically runs composer install to install PHP dependencies for all services.
 
    <br/> 
+   
    Run the command without the `-d` flag initially to monitor the logs and ensure everything is running smoothly. Once you have verified that the setup is working as expected, you can run the command in detached mode:
 
     ```bash
