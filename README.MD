@@ -184,6 +184,7 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     cp adminpanel/.env.example adminpanel/.env
     cp config-server/.env.example config-server/.env
     cp device-service/.env.example device-service/.env
+    cp crm-service/.env.example crm-service/.env
     cp notification-server/.env.example notification-server/.env
     cp auth-server/.env.example auth-server/.env
     ```
@@ -249,6 +250,7 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     docker-compose exec notification-server php /var/www/html/artisan config-client:update
     docker-compose exec auth-server php /var/www/html/artisan config-client:update
     docker-compose exec device-service php /var/www/html/artisan config-client:update
+    docker-compose exec crm-service php /var/www/html/artisan config-client:update
     ```
 
    This command updates each service's configuration based on dynamic values from the `config-server`.
