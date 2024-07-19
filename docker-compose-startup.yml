@@ -39,8 +39,7 @@ services:
               target: /root/.composer/auth.json
         depends_on:
             - db
-        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs &&
-            php /var/www/html/artisan migrate --seed && apache2 -D FOREGROUND"
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     config-server:
         image: phober-php_8.1-apache
