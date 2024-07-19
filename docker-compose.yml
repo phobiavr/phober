@@ -96,6 +96,22 @@ services:
             replicas: 3
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
 
+    crm-service:
+        image: phober-php_8.1-apache
+        ports:
+            - "8400:80"
+        environment:
+            << : *common-env
+        volumes:
+            - ./crm-service:/var/www/html
+        depends_on:
+            - db
+        networks:
+            - backend
+        deploy:
+            replicas: 3
+        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'crm-service' && apache2 -D FOREGROUND"
+
     notification-server:
         image: phober-php_8.1-apache
         container_name: notification-server
@@ -151,6 +167,7 @@ services:
         depends_on:
             - auth-server
             - device-service
+            - crm-service
             - notification-server
 
     #old-website:
