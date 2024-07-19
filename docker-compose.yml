@@ -108,8 +108,6 @@ services:
             - db
         networks:
             - backend
-        deploy:
-            replicas: 3
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'crm-service' && apache2 -D FOREGROUND"
 
     notification-server:
