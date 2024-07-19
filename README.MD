@@ -212,16 +212,21 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
 5. Build and start the Docker containers using the startup configuration:
     ```bash
-    docker-compose -f docker-compose-startup.yml up -d
+    docker-compose -f docker-compose-startup.yml up
     ```
 
-   This step initializes the Docker containers according to the startup configuration. It automatically performs the following tasks:
+   This step initializes the Docker containers according to the startup configuration and automatically runs composer install to install PHP dependencies for all services.
 
-   - Runs `composer install` to install PHP dependencies for all services.
-   - Executes `php artisan migrate --seed` for the `adminpanel` service, seeding the database with initial data.
-    
-   <br/>
+   <br/> 
+   Run the command without the `-d` flag initially to monitor the logs and ensure everything is running smoothly. Once you have verified that the setup is working as expected, you can run the command in detached mode:
+
+    ```bash
+    docker-compose -f docker-compose-startup.yml up -d
+    ```
    After this step, you'll have the core dependencies installed and your database populated with initial data for the adminpanel.
+   <br/>
+   <br/>
+   ***Note:*** This will start the containers in the background and execute any additional startup commands as specified.
 
 
 6. Generate the application keys for the `config-server` and `adminpanel`:
@@ -233,7 +238,13 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    **Note:** The `config-server` is a microservice where dynamic environment values are stored. These values can come from Docker environment variables, `.env` file, or the database, with the database having the highest priority.
 
 
-7. Run the `config-client:update` command for specific services:
+7. Initialize Database Tables and Seed Initial Data for `adminpanel`:
+
+    ```bash
+    docker-compose exec adminpanel php artisan migrate --seed
+    ```
+
+8. Run the `config-client:update` command for specific services:
     ```bash
     docker-compose exec notification-server php /var/www/html/artisan config-client:update
     docker-compose exec auth-server php /var/www/html/artisan config-client:update
@@ -243,18 +254,18 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    This command updates each service's configuration based on dynamic values from the `config-server`.
 
 
-8. Run the `storage:link` command for the adminpanel and device-service:
+9. Run the `storage:link` command for the adminpanel and device-service:
     ```bash
     docker-compose exec adminpanel php artisan storage:link
     docker-compose exec device-service php artisan storage:link
     ```
 
-9. Shut down all Docker containers after the initial setup:
+10. Shut down all Docker containers after the initial setup:
     ```bash
     docker-compose down
     ```
 
-10. Start the full application stack:
+11. Start the full application stack:
     ```bash
     docker-compose up -d
     ```
