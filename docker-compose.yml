@@ -92,8 +92,8 @@ services:
             - db
         networks:
             - backend
-        deploy:
-            replicas: 3
+#        deploy:
+#            replicas: 3
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
 
     crm-service:
