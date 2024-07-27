@@ -2,13 +2,8 @@
 
 - [Technologies](#technologies)
 - [Introduction](#introduction)
-  - [Adminpanel](#p-aligncenteradminpanelp)
-  - [Config Server](#p-aligncenterconfig-serverp)
-  - [Notification Server](#p-aligncenternotification-serverp)
-  - [Device Service](#p-aligncenterdevice-servicep)
-  - [Auth Server](#p-aligncenterauth-serverp)
-  - [API Gateway](#p-aligncenterapi-gatewayp)
-  - [Media](#p-aligncentermediap)
+  - [API Gateway](#api-gateway)
+  - [Media](#media)
 - [Installation](#installation)
 - [Postman Collection](#postman-collection)
 
@@ -22,119 +17,6 @@
 ## Introduction
 
 <p>Welcome to the <b>Phober</b> project! This repository contains multiple microservices, each responsible for different aspects of the application. To understand each submodule deeply, please refer to their respective README files located in their directories.</p>
-
-### <p align="center">Adminpanel</p>
-
-The `adminpanel` service within the <b>Phober</b> project is crucial for managing administrative tasks, user interfaces, and updating various databases and configurations. It interacts with the following databases:
-
-- **`phober_adminpanel`**: Stores administrative data related to the admin panel interface.
-- **`phober_auth`**: Manages authentication and authorization data.
-- **`phober_device`**: Stores data related to device/game management.
-- **`phober_media`**: Handles media files and storage for the application.
-- **`phober_crm`**: Manages CRM customer data.
-- **`phober_staff`**: Stores game/session/invoice data related to staff or user accounts.
-- **`phober_notification`**: Manages notification data for the application.
-- **`phober_config`**: Stores configuration data, managed by `config-server`
-- **`phober_log`**: Stores logs and diagnostic information for the application.
-
-#### Responsibilities:
-- Manages administrative tasks, user interfaces, and updates databases and configurations.
-- Updates configurations within `config-server`.
-- Manages credentials required by `notification-server`.
-
-#### Dependencies:
-- Relies on the `db` service for database operations.
-
-#### Framework and Initialization / Additional Requirements:
-- Built using the Laravel framework.
-- Requires PHP dependencies installed via Composer.
-- Requires seeding the database with initial data.
-- Utilizes an `auth.json` file for downloading dependencies such as `laravel/nova`.
-
-### <p align="center">Config-server</p>
-
-The `config-server` service within the <b>Phober</b> project serves as a repository dedicated to storing configuration data crucial for the application's operation.
-
-#### Responsibilities:
-- Stores essential configuration data required for various aspects of the application.
-- Centralizes configuration management to ensure consistency and accessibility across services.
-- Provides an endpoint (`{app}/config-client/update`) and CLI command (`config-client:update`) for updating configuration settings.
-
-#### Features:
-- **CLI Command (`config-client:update`)**:
-    - Executes configuration updates across services.
-    - Supports variables such as `--dry-run` (simulate update process) and `--overwrite` (overwrite existing configurations).
-
-- **HTTP Route (`{app}/config-client/update`)**:
-    - Allows configuration updates via HTTP requests.
-    - Supports query parameters such as `dry-run` (simulate update process if set to `'true'` default: `'false'`) and `overwrite` (overwrite existing configurations if set to `'true'` default: `'false'`).
-
-#### Dependencies:
-- Relies on the `adminpanel` service for updating and managing configuration data.
-
-#### Additional Details:
-- Utilizes the `laravel-config-server-client` package (available at [GitHub](https://github.com/Abdukhaligov/laravel-config-server-client) and [Packagist](https://packagist.org/packages/abdukhaligov/laravel-config-server-client)) for configuration management commands.
-- Configuration values are retrieved from `.env` files, Docker environment variables, or the `phober_config` database managed by the `adminpanel`.
-
-### <p align="center">Notification-server</p>
-
-The `notification-server` service within the <b>Phober</b> project manages the sending of various notifications such as emails, OTPs, and support messages. It integrates with communication platforms like Discord and Telegram. This service also includes a `notification-queue` component in Docker Compose, enabling asynchronous message handling through job queues to optimize responsiveness.
-
-#### Responsibilities:
-- Sends emails, OTPs, and support messages via Discord, Telegram, etc.
-- Utilizes a `notification-queue` to manage message delivery asynchronously, optimizing performance and responsiveness.
-
-#### Dependencies:
-- Depends on the `config-server` and `adminpanel` services for configuration and data management.
-- Utilizes the `phober_notification` database for data operations.
-
-#### Environment Variables
-
-The following environment variables can be configured via the `.env` file inside the notification-server directory or provided through Docker Compose:
-
- - `DISCORD_TOKEN`: The token for authenticating with the Discord API.
- - `DISCORD_SUPPORT_CHANNEL`: The channel ID for support messages in Discord.
- - `DISCORD_OTP_CHANNEL`: The channel ID for OTP messages in Discord.
- - `TELEGRAM_BOT_TOKEN`: The token for authenticating with the Telegram Bot API.
- - `TELEGRAM_OTP_CHANNEL`: The channel ID for OTP messages in Telegram.
- - `TELEGRAM_SUPPORT_CHANNEL`: The channel ID for support messages in Telegram.
-
-#### Additional Details:
-- Enhances message delivery efficiency using job queues within the Docker environment.
-- Integrates with various communication platforms for versatile notification capabilities.
-
-### <p align="center">Device-service</p>
-
-The `device-service` within the <b>Phober</b> project focuses on displaying hardware-related data, device configurations, and game information.
-
-#### Responsibilities:
-- Displays hardware data, device configurations, and game information.
-- Does not manage data or configurations but serves as a viewer.
-
-#### Dependencies:
-- Relies on the `config-server` and `adminpanel` services for initial setup and configuration.
-- Utilizes the `phober_device` database for data access.
-
-#### Additional Details:
-- Utilizes multiple instances (`replicas: 3`) for redundancy but does not function as a load balancer.
-- Provides an interface to view hardware-related data within the application environment.
-
-### <p align="center">Auth-server</p>
-
-The `auth-server` within the <b>Phober</b> project manages authentication and authorization functionalities using the `phober_auth` database for user authentication.
-
-#### Responsibilities:
-- Handles user authentication and authorization processes.
-- Utilizes the `phober_auth` database for user authentication.
-
-#### Dependencies:
-- Relies on the `config-server` and `adminpanel` services for configuration and integration.
-
-#### Additional Details:
-- Facilitates secure user authentication and authorization within the application environment.
-
-
-Certainly! Here's how you can structure the `Api-Gateway` section in your README file to include responsibilities, dependencies, and additional details:
 
 ### <p align="center">API Gateway</p>
 
@@ -272,8 +154,6 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     ```bash
     docker-compose up -d
     ```
-
-    ***Note:*** Some containers like `api-gateway` and `config-server` or `notification-server` might not run sometimes. If this happens, try to start them by running this command again:
 
 ## Postman Collection
 
