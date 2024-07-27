@@ -20,6 +20,8 @@
 
 ### <p align="center">API Gateway</p>
 
+---
+
 The `Api-Gateway` simplifies client-side interactions by providing a single entry point to access multiple backend services. It abstracts the complexity of service locations and configurations, enhancing application scalability and management.
 
 **Routing Structure**: The `Api-Gateway` routes requests to different microservices based on the URL path:
@@ -30,6 +32,8 @@ The `Api-Gateway` simplifies client-side interactions by providing a single entr
 **Note:** Refer to the provided Nginx configuration file (`env/api-gateway/nginx.conf`) for detailed setup and routing rules.
 
 ### <p align="center">Media</p>
+
+---
 
 The `Media` folder within our repository serves as a centralized repository for storing and managing files, similar to an S3 bucket but located locally. It plays a crucial role in our application for organizing and accessing media files efficiently.
 
