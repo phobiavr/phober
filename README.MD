@@ -18,7 +18,9 @@
 
 <p>Welcome to the <b>Phober</b> project! This repository contains multiple microservices, each responsible for different aspects of the application. To understand each submodule deeply, please refer to their respective README files located in their directories.</p>
 
-**Note:** Tasks for this project are managed using Trello. You can view the project board here.
+* Tasks for this project are managed using Trello. You can view the project board here.
+* Private notes for the project are managed using Milanote.
+* The architecture of the project is drawn using draw.io. These diagrams are pushed to the GitHub repository and can be found [here](https://github.com/phobiavr/phober-diagram).
 
 ### <p align="center">API Gateway</p>
 
