@@ -14,7 +14,7 @@ services:
         image: mysql:8.0
         container_name: db
         ports:
-            - "3306:3306"
+            - "8306:3306"
         environment:
             MYSQL_ROOT_PASSWORD: root
             SERVICE_TAGS: dev
@@ -65,8 +65,6 @@ services:
     config-server:
         image: phober-php_8.1-apache
         container_name: config-server
-#        ports:
-#            - "8700:80"
         environment:
             << : *common-env
         volumes:
@@ -79,8 +77,6 @@ services:
 
     device-service:
         image: phober-php_8.1-apache
-        ports:
-            - "8300-8399:80"
         environment:
             << : *common-env
             APP_URL: "http://localhost:8000/hardware"
@@ -92,14 +88,12 @@ services:
             - db
         networks:
             - backend
-#        deploy:
-#            replicas: 3
+        deploy:
+            replicas: 3
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
 
     crm-service:
         image: phober-php_8.1-apache
-        ports:
-            - "8400:80"
         environment:
             << : *common-env
         volumes:
@@ -113,8 +107,6 @@ services:
     notification-server:
         image: phober-php_8.1-apache
         container_name: notification-server
-        ports:
-            - "8888:80"
         environment:
             << : *common-env
         volumes:
@@ -141,8 +133,6 @@ services:
     auth-server:
         image: phober-php_8.1-apache
         container_name: auth-server
-        ports:
-            - "8500:80"
         environment:
             << : *common-env
         volumes:
@@ -168,38 +158,6 @@ services:
             - crm-service
             - notification-server
 
-    #old-website:
-    #    build:
-    #        context: ./
-    #        dockerfile: ./env/phober-old-website/Dockerfile
-    #    image: phober-old-website
-    #    container_name: old-website
-    #    ports:
-    #        - 80:80
-    #    volumes:
-    #        - ./old-website:/usr/share/nginx/html
-    #    networks:
-    #        - backend
-    #        - frontend
-
-    #website:
-    #    build:
-    #        context: ./
-    #        dockerfile: ./env/phober-website/Dockerfile
-    #    image: phober-website
-    #    container_name: website
-    #    ports:
-    #        - 3030:3000
-    #    volumes:
-    #        - ./website:/app
-    #    stdin_open: true
-    #    environment:
-    #        - CHOKIDAR_USEPOLLING=true
-    #    command: npm run start
-    #    networks:
-    #        - backend
-    #        - frontend
-
 volumes:
     dbdata:
 
@@ -207,6 +165,3 @@ networks:
     backend:
         name: phober_backend
         driver: bridge
-#    frontend:
-#        name: phober_frontend
-#        driver: bridge

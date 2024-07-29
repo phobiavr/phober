@@ -18,6 +18,8 @@
 
 <p>Welcome to the <b>Phober</b> project! This repository contains multiple microservices, each responsible for different aspects of the application. To understand each submodule deeply, please refer to their respective README files located in their directories.</p>
 
+**Note:** Tasks for this project are managed using Trello. You can view the project board here.
+
 ### <p align="center">API Gateway</p>
 
 The `Api-Gateway` simplifies client-side interactions by providing a single entry point to access multiple backend services. It abstracts the complexity of service locations and configurations, enhancing application scalability and management.
