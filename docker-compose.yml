@@ -69,6 +69,7 @@ services:
             << : *common-env
         volumes:
             - ./config-server:/var/www/html
+            - ./shared:/var/www/html/shared
         depends_on:
             - db
         networks:
@@ -84,6 +85,7 @@ services:
             - ./device-service:/var/www/html
             - ./media:/var/www/html/public/storage/media:ro
             - ./media:/var/www/html/storage/app/public/media:ro
+            - ./shared:/var/www/html/shared
         depends_on:
             - db
         networks:
@@ -98,6 +100,7 @@ services:
             << : *common-env
         volumes:
             - ./crm-service:/var/www/html
+            - ./shared:/var/www/html/shared
         depends_on:
             - db
         networks:
@@ -111,6 +114,7 @@ services:
             << : *common-env
         volumes:
             - ./notification-server:/var/www/html
+            - ./shared:/var/www/html/shared
         depends_on:
             - db
         networks:
@@ -137,6 +141,7 @@ services:
             << : *common-env
         volumes:
             - ./auth-server:/var/www/html
+            - ./shared:/var/www/html/shared
         depends_on:
             - db
         networks:
