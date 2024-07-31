@@ -27,7 +27,7 @@ class UpdateHostnameCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $hostname = gethostname(); // Automatically get the hostname
         $containerName = $this->argument('container'); // Manually provided container name
@@ -37,29 +37,20 @@ class UpdateHostnameCommand extends Command
         while (!$success) {
             try {
                 $query = DB::connection('db_log')->table('hostnames');
-                $record = [
+
+                $query->insert([
+                    'hostname' => $hostname,
+                    'created_at' => $timestamp,
                     'container' => $containerName,
                     'updated_at' => $timestamp,
-                ];
+                ]);
 
-                if ($query->where('hostname', $hostname)->exists()) {
-                    $query->where('hostname', $hostname)
-                        ->update($record);
-
-                    $this->info("Hostname record for '{$hostname}' has been updated.");
-                } else {
-                    $query->insert([
-                            'hostname' => $hostname,
-                            'created_at' => $timestamp,
-                        ] + $record);
-
-                    $this->info("Hostname record for '{$hostname}' has been created.");
-                }
+                $this->info("Hostname record for '{$hostname}' has been created.");
 
                 $success = true;
             } catch (\Exception $e) {
-                $this->error("Failed to update or create hostname record: {$e->getMessage()}. Retrying in 1 second...");
-                sleep(1);
+                $this->error("Failed to create a hostname record: {$e->getMessage()}. Retrying in 3 seconds...");
+                sleep(3);
             }
         }
 
