@@ -48,6 +48,7 @@ services:
             << : *common-env
         volumes:
             - ./config-server:/var/www/html
+            - ./shared:/var/www/html/shared
         entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     device-service:
@@ -56,6 +57,7 @@ services:
             << : *common-env
         volumes:
             - ./device-service:/var/www/html
+            - ./shared:/var/www/html/shared
         entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     crm-service:
@@ -64,6 +66,7 @@ services:
             << : *common-env
         volumes:
             - ./crm-service:/var/www/html
+            - ./shared:/var/www/html/shared
         entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     notification-server:
@@ -73,6 +76,7 @@ services:
             << : *common-env
         volumes:
             - ./notification-server:/var/www/html
+            - ./shared:/var/www/html/shared
         entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
     auth-server:
@@ -82,6 +86,7 @@ services:
             << : *common-env
         volumes:
             - ./auth-server:/var/www/html
+            - ./shared:/var/www/html/shared
         entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
 volumes:
