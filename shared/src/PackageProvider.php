@@ -25,6 +25,8 @@ class PackageProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerCommands();
+
+        $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
     }
 
     /**
