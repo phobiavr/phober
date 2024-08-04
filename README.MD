@@ -75,9 +75,9 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     cp auth-server/.env.example auth-server/.env
     ```
 
-4. Ensure you have the `auth.json` file configured in your project directory:
+4. Ensure you have the `auth.json` file configured in your `adminpanel` directory:
     ```bash
-    cp auth.json.example auth.json
+    cp adminpanel/auth.json.example adminpanel/auth.json
     ```
 
     ```json

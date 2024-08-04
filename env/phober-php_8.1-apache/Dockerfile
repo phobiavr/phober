@@ -2,9 +2,10 @@ FROM php:8.1.0RC1-apache
 
 LABEL maintainer="Hikmat Abdukhaligov"
 
-# Arguments defined in docker-compose.yml
-ARG user
-ARG uid
+# Default user and group
+ARG user=user
+ARG uid=1000
+ARG gid=1000
 
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
@@ -40,15 +41,17 @@ RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create a system user to run Composer and Artisan Commands
-RUN mkdir -p /home/$user/.composer \
- && chown -R $user:$user /home/$user
+# Create a system group and user to run Composer and Artisan Commands
+RUN groupadd -g ${gid} ${user} \
+ && useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user} \
+ && mkdir -p /home/${user}/.composer \
+ && chown -R ${user}:${user} /home/${user}
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Change ownership of the working directory to $user
-RUN chown -R $user:$user /var/www/html
+# Change ownership of the working directory to user
+RUN chown -R ${user}:${user} /var/www/html
 
-# Switch to the $user user
-USER $user
+# Switch to the user
+USER ${user}
