@@ -129,6 +129,7 @@ services:
             << : *common-env
         volumes:
             - ./notification-server:/var/www/html
+            - ./shared:/var/www/html/shared
         depends_on:
             - notification-server
         networks:
