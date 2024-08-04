@@ -49,8 +49,8 @@ class UpdateHostnameCommand extends Command
 
                 $success = true;
             } catch (\Exception $e) {
-                $this->error("Failed to create a hostname record: {$e->getMessage()}. Retrying in 3 seconds...");
-                sleep(3);
+                $this->error("Failed to create a hostname record: {$e->getMessage()}. Retrying in 5 seconds...");
+                sleep(5);
             }
         }
 
