@@ -16,7 +16,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Shared\\Package\\": "src"
+      "Shared\\": "src"
     }
   },
   "minimum-stability": "dev",
