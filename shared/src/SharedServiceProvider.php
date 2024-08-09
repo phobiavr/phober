@@ -1,11 +1,12 @@
 <?php
 
-namespace Shared\Package;
+namespace Shared;
 
 use Illuminate\Support\ServiceProvider;
-use Shared\Package\Commands\Console\UpdateHostnameCommand;
+use Shared\Commands\UpdateHostnameCommand;
+use Shared\Middleware\ForceJsonMiddleware;
 
-class PackageProvider extends ServiceProvider
+class SharedServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -27,6 +28,10 @@ class PackageProvider extends ServiceProvider
         $this->registerCommands();
 
         $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+
+        $router = $this->app['router'];
+
+        $router->aliasMiddleware('json', ForceJsonMiddleware::class);
     }
 
     /**

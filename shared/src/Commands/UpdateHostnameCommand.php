@@ -1,6 +1,6 @@
 <?php
 
-namespace Shared\Package\Commands\Console;
+namespace Shared\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
