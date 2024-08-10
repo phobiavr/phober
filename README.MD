@@ -135,10 +135,10 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
 8. Run the `config-client:update` command for specific services:
     ```bash
-    docker-compose exec notification-server php /var/www/html/artisan config-client:update
-    docker-compose exec auth-server php /var/www/html/artisan config-client:update
-    docker-compose exec device-service php /var/www/html/artisan config-client:update
-    docker-compose exec crm-service php /var/www/html/artisan config-client:update
+    docker-compose exec notification-server php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
+    docker-compose exec auth-server php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
+    docker-compose exec device-service php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
+    docker-compose exec crm-service php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
     ```
 
    <details>
