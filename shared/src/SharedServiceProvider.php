@@ -60,11 +60,11 @@ class SharedServiceProvider extends ServiceProvider
      */
     public static function updateEnvConfigs(bool $dryRun): void
     {
-        if (env('CONFIG_SERVER')) {
-            $response = Http::get(env('CONFIG_SERVER'));
-            if ($response->ok()) {
-                self::setEnvironmentValue($response->json(), $dryRun);
-            }
+        $server = env('CONFIG_SERVER', 'http://config-server');
+
+        $response = Http::get($server);
+        if ($response->ok()) {
+            self::setEnvironmentValue($response->json(), $dryRun);
         }
     }
 
@@ -79,6 +79,10 @@ class SharedServiceProvider extends ServiceProvider
         $envFile = ConfigClient::$customEnvFile ?? app()->environmentFilePath();
         ConfigClient::$newConfigCount = 0;
         ConfigClient::$updatedConfigCount = 0;
+
+        if (!file_exists($envFile)) {
+            file_put_contents($envFile, '');
+        }
 
         $str = file_get_contents($envFile);
 
