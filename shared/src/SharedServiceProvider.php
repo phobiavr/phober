@@ -2,10 +2,12 @@
 
 namespace Shared;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 use Shared\Commands\UpdateConfigsCommand;
 use Shared\Commands\UpdateHostnameCommand;
+use Shared\Middleware\AuthServerMiddleware;
 use Shared\Middleware\ForceJsonMiddleware;
 
 class SharedServiceProvider extends ServiceProvider
@@ -34,10 +36,15 @@ class SharedServiceProvider extends ServiceProvider
         $router = $this->app['router'];
 
         $router->aliasMiddleware('json', ForceJsonMiddleware::class);
+        $router->aliasMiddleware('auth.server', AuthServerMiddleware::class);
 
         if (ConfigClient::$runEveryTime) {
             self::updateEnvConfigs(false);
         }
+
+        Auth::extend('json', function ($app, $name, array $config) {
+            return new JsonGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
+        });
     }
 
     /**
