@@ -3,6 +3,7 @@
 namespace Shared;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 use Shared\Commands\UpdateConfigsCommand;
@@ -45,6 +46,15 @@ class SharedServiceProvider extends ServiceProvider
         Auth::extend('json', function ($app, $name, array $config) {
             return new JsonGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
         });
+
+        Config::set('database.connections.db_shared', [
+            'driver' => env('DB_SHARED_CONNECTION', 'mysql'),
+            'host' => env('DB_SHARED_HOST', '127.0.0.1'),
+            'port' => env('DB_SHARED_PORT', '3306'),
+            'database' => env('DB_SHARED_DATABASE', 'phober_log'),
+            'username' => env('DB_SHARED_USERNAME', 'forge'),
+            'password' => env('DB_SHARED_PASSWORD', ''),
+        ]);
     }
 
     /**

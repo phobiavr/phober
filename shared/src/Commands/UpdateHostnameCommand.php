@@ -36,7 +36,7 @@ class UpdateHostnameCommand extends Command
 
         while (!$success) {
             try {
-                $query = DB::connection('db_log')->table('hostnames');
+                $query = DB::connection('db_shared')->table('hostnames');
 
                 $query->insert([
                     'hostname' => $hostname,
