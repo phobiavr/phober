@@ -51,7 +51,7 @@ class SharedServiceProvider extends ServiceProvider
             'driver' => env('DB_SHARED_CONNECTION', 'mysql'),
             'host' => env('DB_SHARED_HOST', '127.0.0.1'),
             'port' => env('DB_SHARED_PORT', '3306'),
-            'database' => env('DB_SHARED_DATABASE', 'phober_log'),
+            'database' => env('DB_SHARED_DATABASE', 'phober_shared'),
             'username' => env('DB_SHARED_USERNAME', 'forge'),
             'password' => env('DB_SHARED_PASSWORD', ''),
         ]);
