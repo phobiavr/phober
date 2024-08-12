@@ -96,6 +96,7 @@ class SharedServiceProvider extends ServiceProvider
         $envFile = ConfigClient::$customEnvFile ?? app()->environmentFilePath();
         ConfigClient::$newConfigCount = 0;
         ConfigClient::$updatedConfigCount = 0;
+        $hasChanges = false;
 
         if (!file_exists($envFile)) {
             file_put_contents($envFile, '');
@@ -105,28 +106,35 @@ class SharedServiceProvider extends ServiceProvider
 
         if (count($values) > 0) {
             foreach ($values as $envKey => $envValue) {
-                $keyPosition = strpos($str, "{$envKey}=");
-                $endOfLinePosition = strpos($str, "\n", $keyPosition);
-                $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
-
                 if (str_contains($envValue, ' ')) {
                     $envValue = "\"$envValue\"";
                 }
 
+                $keyPosition = strpos($str, "{$envKey}=");
+
                 // If key does not exist, add it
-                if (!$keyPosition || !$endOfLinePosition || !$oldLine) {
+                if ($keyPosition === false) {
                     $str .= "{$envKey}={$envValue}\n";
                     ConfigClient::$newConfigCount++;
-                } else if (ConfigClient::$overwrite && ($newLine = "{$envKey}={$envValue}") && $oldLine != $newLine) {
-                    $str = str_replace($oldLine, $newLine, $str);
-                    ConfigClient::$updatedConfigCount++;
+                    $hasChanges = true;
+                } else {
+                    $endOfLinePosition = strpos($str, "\n", $keyPosition);
+                    $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
+
+                    $newLine = "{$envKey}={$envValue}";
+
+                    if (ConfigClient::$overwrite && $oldLine != $newLine) {
+                        $str = str_replace($oldLine, $newLine, $str);
+                        ConfigClient::$updatedConfigCount++;
+                        $hasChanges = true;
+                    }
                 }
             }
 
-            $str .= "\n"; // In case the searched variable is in the last line without \n
+            if ($hasChanges && !str_ends_with($str, "\n")) {
+                $str .= "\n";
+            }
         }
-
-        $str = substr($str, 0, -1);
 
         $dryRun || file_put_contents($envFile, $str) !== false;
     }

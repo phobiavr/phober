@@ -23,6 +23,8 @@ class UpdateConfigsCommand extends Command
   {
     if ($customEnvFile = $this->option('custom-env-file')) {
       ConfigClient::$customEnvFile = $customEnvFile;
+    } else {
+      ConfigClient::$customEnvFile = '.env.shared';
     }
 
     if ($this->option('overwrite')) {
