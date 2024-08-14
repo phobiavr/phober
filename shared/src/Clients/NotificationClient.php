@@ -1,14 +1,12 @@
 <?php
 
-namespace Shared;
+namespace Shared\Clients;
 
 use Illuminate\Support\Facades\Http;
 use Shared\Notification\Channel;
 use Shared\Notification\Provider;
 
-class NotificationClient {
-    private static ?string $url = null;
-
+class NotificationClient extends Client {
     public static function getUrl(): string {
         return static::$url ??= env('NOTIFICATION_SERVER', 'http://notification-server');
     }

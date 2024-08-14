@@ -37,7 +37,7 @@ class UpdateConfigsCommand extends Command
       $this->displayUpdateResults(ConfigClient::$newConfigCount, ConfigClient::$updatedConfigCount);
       $this->info('Dry run completed. No actual changes were made.');
     } else {
-      ConfigClient::update();
+      ConfigClient::update(false);
       $this->displayUpdateResults(ConfigClient::$newConfigCount, ConfigClient::$updatedConfigCount);
     }
   }
