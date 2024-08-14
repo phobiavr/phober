@@ -5,8 +5,8 @@ namespace Shared\Clients;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 
-class OtpClient extends Client {
-
+class OtpClient implements ClientInterface {
+    protected static ?string $url = null;
     public int $digits = 4;
     public int $validity = 10;
     public string $identifier;

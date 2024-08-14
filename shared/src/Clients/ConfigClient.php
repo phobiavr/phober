@@ -4,7 +4,9 @@ namespace Shared\Clients;
 
 use Illuminate\Support\Facades\Http;
 
-class ConfigClient  extends Client {
+class ConfigClient implements ClientInterface {
+    protected static ?string $url = null;
+
     public static function getUrl(): string {
         return static::$url ??= env('CONFIG_SERVER', 'http://config-server');
     }

@@ -5,7 +5,8 @@ namespace Shared\Clients;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 
-class AuthClient extends Client {
+class AuthClient implements ClientInterface {
+    protected static ?string $url = null;
 
     public static function getUrl(): string {
         return static::$url ??= env('AUTH_SERVER', 'http://auth-server');
