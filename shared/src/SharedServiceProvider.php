@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Telescope\Telescope;
 use Shared\Commands\UpdateConfigsCommand;
 use Shared\Commands\UpdateHostnameCommand;
 use Shared\Middleware\AuthServerMiddleware;
@@ -20,9 +21,8 @@ class SharedServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
-        //
+    public function register(): void {
+        Telescope::ignoreMigrations();
     }
 
     /**
