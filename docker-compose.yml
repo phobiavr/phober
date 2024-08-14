@@ -107,6 +107,19 @@ services:
             - backend
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'crm-service' && apache2 -D FOREGROUND"
 
+    staff-service:
+        image: phober-php_8.1-apache
+        environment:
+            << : *common-env
+        volumes:
+            - ./staff-service:/var/www/html
+            - ./shared:/var/www/html/shared
+        depends_on:
+            - db
+        networks:
+            - backend
+        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'staff-service' && apache2 -D FOREGROUND"
+
     notification-server:
         image: phober-php_8.1-apache
         container_name: notification-server
@@ -159,10 +172,11 @@ services:
         networks:
             - backend
         depends_on:
+            - notification-server
             - auth-server
             - device-service
             - crm-service
-            - notification-server
+            - staff-service
 
 volumes:
     dbdata:

@@ -10,15 +10,12 @@
 [submodule "config-server"]
 	path = config-server
 	url = https://github.com/phobiavr/phober-config-server.git
-[submodule "website"]
-	path = website
-	url = https://github.com/phobiavr/website.git
-[submodule "old-website"]
-	path = old-website
-	url = https://github.com/phobiavr/old-website.git
 [submodule "notification-server"]
 	path = notification-server
 	url = https://github.com/phobiavr/phober-notification-server.git
 [submodule "crm-service"]
 	path = crm-service
 	url = https://github.com/phobiavr/phober-crm-service.git
+[submodule "staff-service"]
+	path = staff-service
+	url = https://github.com/phobiavr/phober-staff-service.git
