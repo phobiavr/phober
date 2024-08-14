@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Telescope\Telescope;
+use Shared\Clients\ConfigClient;
 use Shared\Commands\UpdateConfigsCommand;
 use Shared\Commands\UpdateHostnameCommand;
 use Shared\Middleware\AuthServerMiddleware;
 use Shared\Middleware\ForceJsonMiddleware;
 use Shared\Middleware\OTPMiddleware;
 
-class SharedServiceProvider extends ServiceProvider
-{
+class SharedServiceProvider extends ServiceProvider {
     /**
      * Register any application services.
      *
@@ -53,8 +53,8 @@ class SharedServiceProvider extends ServiceProvider
 
         Config::set('database.connections.db_shared', [
             'driver' => env('DB_SHARED_CONNECTION', 'mysql'),
-            'host' => env('DB_SHARED_HOST', '127.0.0.1'),
-            'port' => env('DB_SHARED_PORT', '3306'),
+            'host'   => env('DB_SHARED_HOST', '127.0.0.1'),
+            'port'   => env('DB_SHARED_PORT', '3306'),
             'database' => env('DB_SHARED_DATABASE', 'phober_shared'),
             'username' => env('DB_SHARED_USERNAME', 'forge'),
             'password' => env('DB_SHARED_PASSWORD', ''),
@@ -66,8 +66,7 @@ class SharedServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerCommands(): void
-    {
+    protected function registerCommands(): void {
         $this->commands([
             UpdateHostnameCommand::class,
             UpdateConfigsCommand::class,
@@ -79,8 +78,7 @@ class SharedServiceProvider extends ServiceProvider
      * @return void
      * @link https://github.com/vlucas/phpdotenv
      */
-    public static function updateEnvConfigs(bool $dryRun): void
-    {
+    public static function updateEnvConfigs(bool $dryRun): void {
         $server = env('CONFIG_SERVER', 'http://config-server');
 
         $response = Http::get($server);
@@ -95,8 +93,7 @@ class SharedServiceProvider extends ServiceProvider
      * @return void
      * @link https://stackoverflow.com/a/54173207
      */
-    private static function setEnvironmentValue(array $values, $dryRun): void
-    {
+    private static function setEnvironmentValue(array $values, $dryRun): void {
         $envFile = ConfigClient::$customEnvFile ?? app()->environmentFilePath();
         ConfigClient::$newConfigCount = 0;
         ConfigClient::$updatedConfigCount = 0;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Shared;
+namespace Shared\Clients;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
@@ -20,7 +20,7 @@ class OtpClient {
 
     public static function generateOtp(): self {
         $self = new self();
-        $self->identifier = gethostname() . '-' . Helper::quickRandom(5);
+        $self->identifier = gethostname() . '-' . \Shared\Helper::quickRandom(5);
 
         $response = Http::accept('application/json')
             ->post(self::getUrl() . '/generate', [
