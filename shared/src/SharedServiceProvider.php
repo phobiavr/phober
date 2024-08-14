@@ -13,6 +13,7 @@ use Shared\Commands\UpdateConfigsCommand;
 use Shared\Commands\UpdateHostnameCommand;
 use Shared\Middleware\AuthServerMiddleware;
 use Shared\Middleware\ForceJsonMiddleware;
+use Shared\Middleware\OTPMiddleware;
 
 class SharedServiceProvider extends ServiceProvider
 {
@@ -32,7 +33,7 @@ class SharedServiceProvider extends ServiceProvider
      * @param Kernel $kernel
      * @return void
      */
-    public function boot(\Illuminate\Routing\Router $router, \Illuminate\Contracts\Http\Kernel $kernel): void {
+    public function boot(Router $router, Kernel $kernel): void {
         $this->registerCommands();
 
         $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
@@ -40,6 +41,7 @@ class SharedServiceProvider extends ServiceProvider
 
         $kernel->pushMiddleware(ForceJsonMiddleware::class);
         $router->aliasMiddleware('auth.server', AuthServerMiddleware::class);
+        $router->aliasMiddleware('otp', OTPMiddleware::class);
 
         if (ConfigClient::$runEveryTime) {
             self::updateEnvConfigs(false);
