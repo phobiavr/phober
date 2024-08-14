@@ -3,7 +3,7 @@
 namespace Shared\Commands;
 
 use Illuminate\Console\Command;
-use Shared\ConfigClient;
+use Shared\Clients\ConfigClient;
 
 class UpdateConfigsCommand extends Command
 {

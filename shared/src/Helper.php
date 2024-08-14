@@ -2,8 +2,7 @@
 
 namespace Shared;
 
-class Helper
-{
+class Helper {
     public static function quickRandom($length = 16): string {
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 

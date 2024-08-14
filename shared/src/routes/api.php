@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
-use Shared\ConfigClient;
+use Shared\Clients\ConfigClient;
 
 Route::get('/instance-info', function () {
     return response()->json([
@@ -31,7 +31,7 @@ Route::prefix('/config-client')->group(function () {
         return response()->json([
             'message' => 'Config update command executed.',
             'options' => [
-                'dry_run' => $dryRun,
+                'dry_run'   => $dryRun,
                 'overwrite' => $overwrite,
                 'custom_env_file' => $envFile ?: 'Default',
             ],
