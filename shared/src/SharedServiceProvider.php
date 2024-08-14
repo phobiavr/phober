@@ -2,6 +2,8 @@
 
 namespace Shared;
 
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -26,17 +28,17 @@ class SharedServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      *
+     * @param Router $router
+     * @param Kernel $kernel
      * @return void
      */
-    public function boot(): void
-    {
+    public function boot(\Illuminate\Routing\Router $router, \Illuminate\Contracts\Http\Kernel $kernel): void {
         $this->registerCommands();
 
         $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+        $this->loadRoutesFrom((base_path('routes/api.php')));
 
-        $router = $this->app['router'];
-
-        $router->aliasMiddleware('json', ForceJsonMiddleware::class);
+        $kernel->pushMiddleware(ForceJsonMiddleware::class);
         $router->aliasMiddleware('auth.server', AuthServerMiddleware::class);
 
         if (ConfigClient::$runEveryTime) {
