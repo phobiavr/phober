@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Http;
 use Shared\Notification\Channel;
 use Shared\Notification\Provider;
 
-class NotificationClient extends Client {
+class NotificationClient implements ClientInterface {
+    protected static ?string $url = null;
+
     public static function getUrl(): string {
         return static::$url ??= env('NOTIFICATION_SERVER', 'http://notification-server');
     }
