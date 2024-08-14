@@ -60,6 +60,15 @@ services:
             - ./shared:/var/www/html/shared
         entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
 
+    staff-service:
+        image: phober-php_8.1-apache
+        environment:
+            << : *common-env
+        volumes:
+            - ./staff-service:/var/www/html
+            - ./shared:/var/www/html/shared
+        entrypoint: sh -c "composer install --no-cache --ignore-platform-reqs && apache2 -D FOREGROUND"
+
     crm-service:
         image: phober-php_8.1-apache
         environment:
