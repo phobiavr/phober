@@ -13,6 +13,7 @@ use Shared\Commands\UpdateConfigsCommand;
 use Shared\Commands\UpdateHostnameCommand;
 use Shared\Middleware\AuthServerMiddleware;
 use Shared\Middleware\ForceJsonMiddleware;
+use Shared\Middleware\OTPGenerateMiddleware;
 use Shared\Middleware\OTPMiddleware;
 
 class SharedServiceProvider extends ServiceProvider {
@@ -41,6 +42,7 @@ class SharedServiceProvider extends ServiceProvider {
         $kernel->pushMiddleware(ForceJsonMiddleware::class);
         $router->aliasMiddleware('auth.server', AuthServerMiddleware::class);
         $router->aliasMiddleware('otp', OTPMiddleware::class);
+        $router->aliasMiddleware('otp.generate', OTPGenerateMiddleware::class);
 
         if (ConfigClient::$runEveryTime) {
             ConfigClient::update(false);
