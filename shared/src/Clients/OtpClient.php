@@ -10,7 +10,6 @@ class OtpClient implements ClientInterface {
     public int $digits = 4;
     public int $validity = 10;
     public string $identifier;
-    public string $code;
     public bool $success = false;
 
     public static function getUrl(): string {
@@ -19,17 +18,15 @@ class OtpClient implements ClientInterface {
 
     public static function generateOtp(): self {
         $self = new self();
-        $self->identifier = gethostname() . '-' . \Shared\Helper::quickRandom(5);
 
         $response = Http::accept('application/json')
             ->post(self::getUrl() . '/generate', [
-                'identifier' => $self->identifier,
-                'digits'     => $self->digits,
-                'validity'   => $self->validity,
+                'digits'   => $self->digits,
+                'validity' => $self->validity,
             ]);
 
         if ($response->status() === Response::HTTP_OK) {
-            $self->code = $response['code'];
+            $self->identifier = $response['identifier'];
             $self->success = true;
         }
 
