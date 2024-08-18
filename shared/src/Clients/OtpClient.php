@@ -5,22 +5,18 @@ namespace Shared\Clients;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 
-class OtpClient implements ClientInterface {
-    protected static ?string $url = null;
+class OtpClient {
+    protected static ?string $url = 'http://auth-server/otp';
     public int $digits = 4;
     public int $validity = 10;
     public string $identifier;
     public bool $success = false;
 
-    public static function getUrl(): string {
-        return static::$url ??= env('AUTH_SERVER', 'http://auth-server') . '/otp';
-    }
-
     public static function generateOtp(): self {
         $self = new self();
 
         $response = Http::accept('application/json')
-            ->post(self::getUrl() . '/generate', [
+            ->post(self::$url . '/generate', [
                 'digits'   => $self->digits,
                 'validity' => $self->validity,
             ]);
@@ -36,13 +32,13 @@ class OtpClient implements ClientInterface {
     public static function validate(string $identifier, string $code = null): bool {
         if ($code) {
             $response = Http::accept('application/json')
-                ->post(self::getUrl() . '/validate', [
+                ->post(self::$url . '/validate', [
                     'identifier' => $identifier,
                     'code'       => $code,
                 ]);
         } else {
             $response = Http::accept('application/json')
-                ->post(self::getUrl() . '/check-submitted', [
+                ->post(self::$url . '/check-submitted', [
                     'identifier' => $identifier,
                 ]);
         }
