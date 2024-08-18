@@ -47,7 +47,7 @@ class ConfigClient implements ClientInterface {
      * @link https://stackoverflow.com/a/54173207
      */
     private static function setEnvironmentValue(array $values, $dryRun): void {
-        $envFile = ConfigClient::$customEnvFile ?? app()->environmentFilePath();
+        $envFile = ConfigClient::$customEnvFile ?? base_path('.env.shared');
         ConfigClient::$newConfigCount = 0;
         ConfigClient::$updatedConfigCount = 0;
         $hasChanges = false;
