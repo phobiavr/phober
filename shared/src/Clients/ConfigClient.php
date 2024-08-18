@@ -4,12 +4,8 @@ namespace Shared\Clients;
 
 use Illuminate\Support\Facades\Http;
 
-class ConfigClient implements ClientInterface {
-    protected static ?string $url = null;
-
-    public static function getUrl(): string {
-        return static::$url ??= env('CONFIG_SERVER', 'http://config-server');
-    }
+class ConfigClient {
+    protected static ?string $url = 'http://config-server';
 
     public static bool $overwrite = false;
     public static bool $runEveryTime = false;
@@ -31,9 +27,7 @@ class ConfigClient implements ClientInterface {
      * @link https://github.com/vlucas/phpdotenv
      */
     public static function update(bool $dryRun): void {
-        $server = env('CONFIG_SERVER', 'http://config-server');
-
-        $response = Http::get($server);
+        $response = Http::get(self::$url);
 
         if ($response->ok()) {
             self::setEnvironmentValue($response->json(), $dryRun);
@@ -44,7 +38,6 @@ class ConfigClient implements ClientInterface {
      * @param array $values
      * @param $dryRun
      * @return void
-     * @link https://stackoverflow.com/a/54173207
      */
     private static function setEnvironmentValue(array $values, $dryRun): void {
         $envFile = ConfigClient::$customEnvFile ?? base_path('.env.shared');
