@@ -15,6 +15,7 @@ use Shared\Middleware\AuthServerMiddleware;
 use Shared\Middleware\ForceJsonMiddleware;
 use Shared\Middleware\OTPGenerateMiddleware;
 use Shared\Middleware\OTPMiddleware;
+use Shared\Middleware\TranslationMiddleware;
 
 class SharedServiceProvider extends ServiceProvider {
     /**
@@ -40,6 +41,7 @@ class SharedServiceProvider extends ServiceProvider {
         $this->loadRoutesFrom((base_path('routes/api.php')));
 
         $kernel->pushMiddleware(ForceJsonMiddleware::class);
+        $kernel->pushMiddleware(TranslationMiddleware::class);
         $router->aliasMiddleware('auth.server', AuthServerMiddleware::class);
         $router->aliasMiddleware('otp', OTPMiddleware::class);
         $router->aliasMiddleware('otp.generate', OTPGenerateMiddleware::class);
