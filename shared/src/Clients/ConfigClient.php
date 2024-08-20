@@ -28,7 +28,7 @@ class ConfigClient {
      */
     public static function update(bool $dryRun) {
         $response = Http::withHeaders([
-            'X-SERVICE-KEY' => env('SERVICE_KEY'),
+            'X-APP-KEY' => env('APP_KEY'),
         ])->get(self::$url);
 
         if ($response->ok()) {
