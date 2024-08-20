@@ -115,25 +115,13 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    </details>
 
 
-6. Generate the application keys for the `config-server` and `adminpanel`:
-    ```bash
-    docker-compose exec config-server php artisan key:generate
-    docker-compose exec adminpanel php artisan key:generate
-    ```
-   <details>
-      <summary>Notes</summary>
-
-      The `config-server` is a microservice where dynamic environment values are stored. These values can come from Docker environment variables, `.env` file, or the database, with the database having the highest priority.
-   </details>
-
-
-7. Initialize Database Tables and Seed Initial Data for `adminpanel`:
+6. Initialize Database Tables and Seed Initial Data for `adminpanel`:
 
     ```bash
     docker-compose exec adminpanel php artisan migrate --seed
     ```
 
-8. Run the `config-client:update` command for specific services:
+7. Run the `config-client:update` command for specific services:
     ```bash
     docker-compose exec notification-server php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
     docker-compose exec auth-server php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
@@ -148,13 +136,13 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    </details>
 
 
-9. Run the `storage:link` command for the adminpanel and device-service:
+8. Run the `storage:link` command for the adminpanel and device-service:
     ```bash
     docker-compose exec adminpanel php artisan storage:link
     docker-compose exec device-service php artisan storage:link
     ```
 
-10. Shut down all Docker containers after the initial setup and before start the full application stack:
+9. Shut down all Docker containers after the initial setup and before start the full application stack:
     ```bash
     docker-compose down
     docker-compose up -d
