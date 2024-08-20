@@ -26,8 +26,10 @@ class ConfigClient {
      * @return void
      * @link https://github.com/vlucas/phpdotenv
      */
-    public static function update(bool $dryRun): void {
-        $response = Http::get(self::$url);
+    public static function update(bool $dryRun) {
+        $response = Http::withHeaders([
+            'X-SERVICE-KEY' => env('SERVICE_KEY'),
+        ])->get(self::$url);
 
         if ($response->ok()) {
             self::setEnvironmentValue($response->json(), $dryRun);

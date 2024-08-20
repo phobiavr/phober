@@ -15,6 +15,7 @@ use Shared\Middleware\AuthServerMiddleware;
 use Shared\Middleware\ForceJsonMiddleware;
 use Shared\Middleware\OTPGenerateMiddleware;
 use Shared\Middleware\OTPMiddleware;
+use Shared\Middleware\PrivateMiddleware;
 use Shared\Middleware\TranslationMiddleware;
 
 class SharedServiceProvider extends ServiceProvider {
@@ -45,6 +46,7 @@ class SharedServiceProvider extends ServiceProvider {
         $router->aliasMiddleware('auth.server', AuthServerMiddleware::class);
         $router->aliasMiddleware('otp', OTPMiddleware::class);
         $router->aliasMiddleware('otp.generate', OTPGenerateMiddleware::class);
+        $router->aliasMiddleware('private', PrivateMiddleware::class);
 
         if (ConfigClient::$runEveryTime) {
             ConfigClient::update(false);

@@ -10,8 +10,8 @@ Route::get('/instance-info', function () {
     ]);
 });
 
-Route::prefix('/config-client')->group(function () {
-    Route::get('/update', function () {
+Route::middleware('private')->group(function () {
+    Route::get('/config-client/update', function () {
         $dryRun = request()->query('dry-run', false) === 'true'; // Ensure boolean conversion
         $overwrite = request()->query('overwrite', false) === 'true'; // Ensure boolean conversion
         $envFile = request()->query('env-file');
