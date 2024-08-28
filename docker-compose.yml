@@ -8,6 +8,7 @@ x-common-env: &common-env
     APACHE_PID_FILE: /var/run/apache2/apache2.pid
     APACHE_LOCK_DIR: /var/lock/apache2
     APP_KEY: base64:10GvWo3QVZLvODVr0rKxufpyI2rUVmLqbWv6dfEWs4U=
+    APP_TIMEZONE: Asia/Baku
 
 services:
     db:
