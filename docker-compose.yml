@@ -57,6 +57,7 @@ services:
             - ./adminpanel:/var/www/html
             - ./media:/var/www/html/public/storage/media
             - ./media:/var/www/html/storage/app/public/media
+            - ./shared:/var/www/html/shared
         depends_on:
             - db
         networks:

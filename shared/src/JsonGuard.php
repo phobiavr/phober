@@ -23,15 +23,15 @@ class JsonGuard implements Guard {
     /**
      * Determine if the current user is authenticated.
      */
-    public function check() {
-//    return !is_null($this->user());
+    public function check(): bool {
+        return !is_null($this->user());
     }
 
     /**
      * Determine if the current user is a guest.
      */
-    public function guest() {
-//    return !$this->check();
+    public function guest(): bool {
+        return !$this->check();
     }
 
     /**
@@ -56,9 +56,8 @@ class JsonGuard implements Guard {
      * Get the ID for the currently authenticated user.
      */
     public function id() {
-//    if ($user = $this->user()) {
-//      return $this->user()->getAuthIdentifier();
-//    }
+        return $this->user()['id'] ?? null;
+
     }
 
     /**
