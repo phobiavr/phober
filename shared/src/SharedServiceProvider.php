@@ -64,6 +64,8 @@ class SharedServiceProvider extends ServiceProvider {
             'username' => env('DB_SHARED_USERNAME', 'forge'),
             'password' => env('DB_SHARED_PASSWORD', ''),
         ]);
+
+        $this->app->useLangPath(__DIR__ . '/../resources/lang');
     }
 
     /**
