@@ -1,6 +1,6 @@
 <?php
 
-namespace Shared\Device;
+namespace Shared\Enums;
 
 enum ScheduleEnum: string {
     case MAINTENANCE = 'MAINTENANCE';
