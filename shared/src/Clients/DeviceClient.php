@@ -6,7 +6,7 @@ use DateTime;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Shared\Device\ScheduleEnum;
+use Shared\Enums\ScheduleEnum;
 
 class DeviceClient {
     protected static ?string $url = 'http://device-service';
