@@ -10,4 +10,5 @@ enum ScheduleEnum: string {
     case IN_USE = 'IN_USE';
     case IN_SESSION = 'IN_SESSION';
     case ON_EVENT = 'ON_EVENT';
+    case CANCELED = 'CANCELED';
 }
