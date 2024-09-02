@@ -7,10 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Shared\Author;
 
 trait Authorable {
-    public function getMorphClass() {
-        return static::$authorableType ?? get_class();
-    }
-
     protected static function bootAuthorable(): void {
         static::created(function ($model) {
             if (Auth::check()) $model->author()->create(['created_by' => Auth::id(), 'last_updated_by' => Auth::id()]);
