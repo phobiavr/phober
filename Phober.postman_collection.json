@@ -11,6 +11,29 @@
 			"name": "Auth Server",
 			"item": [
 				{
+					"name": "Shared",
+					"item": [
+						{
+							"name": "Instance Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/auth/instance-info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"instance-info"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Get token",
 					"event": [
 						{
@@ -86,12 +109,7 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Notification Server",
-			"item": [
+				},
 				{
 					"name": "Generate OTP",
 					"request": {
@@ -104,7 +122,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"identifier\": \"service1-test@gmail.com\",\n    \"digits\": 6,\n    \"validity\": 10\n}",
+							"raw": "{\n    \"digits\": 4,\n    \"validity\": 10\n}",
 							"options": {
 								"raw": {
 									"headerFamily": "json",
@@ -113,12 +131,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/notification/otp/generate",
+							"raw": "{{baseUrl}}/auth/otp/generate",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"notification",
+								"auth",
 								"otp",
 								"generate"
 							]
@@ -138,7 +156,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"identifier\": \"service1-test@gmail.com\",\n    \"token\": \"KYKBZ3\"\n}",
+							"raw": "{\n    \"identifier\": \"service1-test@gmail.com\",\n    \"code\": \"6804\"\n}",
 							"options": {
 								"raw": {
 									"headerFamily": "json",
@@ -147,12 +165,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/notification/otp/validate",
+							"raw": "{{baseUrl}}/auth/otp/validate",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"notification",
+								"auth",
 								"otp",
 								"validate"
 							]
@@ -161,18 +179,42 @@
 					"response": []
 				},
 				{
-					"name": "Send message to support",
+					"name": "Submit OTP",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/otp/submit?identifier=lbYMNdZoht&code=2921",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"submit"
+							],
+							"query": [
 								{
-									"key": "token",
-									"value": "{{bearerToken}}",
-									"type": "string"
+									"key": "identifier",
+									"value": "lbYMNdZoht"
+								},
+								{
+									"key": "code",
+									"value": "2921"
 								}
 							]
-						},
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Submitted OTP",
+					"request": {
 						"method": "POST",
 						"header": [
 							{
@@ -182,45 +224,66 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"subject\": \"Subject\",\n    \"message\": \"Message\"\n}",
+							"raw": "{\n    \"identifier\": \"service1-test@gmail.com\"\n}",
 							"options": {
 								"raw": {
-									"headerFamily": "json",
 									"language": "json"
 								}
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/notification/support/message",
+							"raw": "{{baseUrl}}/auth/otp/check-submitted",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"notification",
-								"support",
-								"message"
+								"auth",
+								"otp",
+								"check-submitted"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
 							]
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notification Server",
+			"item": [
+				{
+					"name": "Shared",
+					"item": [
+						{
+							"name": "Instance Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/notification/instance-info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"notification",
+										"instance-info"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				},
 				{
-					"name": "Test",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Send",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{bearerToken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -229,7 +292,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"subject\": \"Subject\",\n    \"message\": \"Message\"\n}",
+							"raw": "{\n    \"provider\": \"TELEGRAM\",\n    \"channel\": \"OTP\",\n    \"message\": \"test\"\n}",
 							"options": {
 								"raw": {
 									"headerFamily": "json",
@@ -238,13 +301,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/notification/test",
+							"raw": "{{baseUrl}}/notification/",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"notification",
-								"test"
+								""
 							]
 						}
 					},
@@ -289,147 +352,51 @@
 			"name": "Device Service",
 			"item": [
 				{
-					"name": "search (deprecated)",
+					"name": "Shared",
 					"item": [
 						{
-							"name": "Get Multiplayer Games",
+							"name": "Auth check",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
-									"raw": "{{baseUrl}}/hardware/games/search/multiplayer?size=10&page=1",
+									"raw": "{{baseUrl}}/hardware/",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
 										"hardware",
-										"games",
-										"search",
-										"multiplayer"
-									],
-									"query": [
-										{
-											"key": "size",
-											"value": "10"
-										},
-										{
-											"key": "page",
-											"value": "1"
-										}
+										""
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Get Games by Genre slug",
+							"name": "Instance info",
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/hardware/games/search/by-genre/:genre?size=10&page=1",
+									"raw": "{{baseUrl}}/hardware/instance-info",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
 										"hardware",
-										"games",
-										"search",
-										"by-genre",
-										":genre"
-									],
-									"query": [
-										{
-											"key": "size",
-											"value": "10"
-										},
-										{
-											"key": "page",
-											"value": "1"
-										}
-									],
-									"variable": [
-										{
-											"key": "genre",
-											"value": "horror",
-											"description": "(Required) "
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Games by Device slug",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/hardware/games/search/by-device/:device?size=10&page=1",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"hardware",
-										"games",
-										"search",
-										"by-device",
-										":device"
-									],
-									"query": [
-										{
-											"key": "size",
-											"value": "10"
-										},
-										{
-											"key": "page",
-											"value": "1"
-										}
-									],
-									"variable": [
-										{
-											"key": "device",
-											"value": "htc-vive",
-											"description": "(Required) "
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Games by Rating Copy",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/hardware/games/search/by-rating/:rating?size=10&page=1",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"hardware",
-										"games",
-										"search",
-										"by-rating",
-										":rating"
-									],
-									"query": [
-										{
-											"key": "size",
-											"value": "10"
-										},
-										{
-											"key": "page",
-											"value": "1"
-										}
-									],
-									"variable": [
-										{
-											"key": "rating",
-											"value": "5",
-											"description": "(Required) "
-										}
+										"instance-info"
 									]
 								}
 							},
@@ -444,7 +411,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"device\": \"ps-vr\",\r\n    \"genre\": \"racing\",\r\n    \"multiplayer\": false\r\n}",
+							"raw": "{\r\n    \"device\": \"PS_VR\",\r\n    \"genre\": \"racing\",\r\n    \"multiplayer\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -479,7 +446,13 @@
 					"name": "Get Games",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "az",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/hardware/games?size=10&page=1",
 							"host": [
@@ -548,6 +521,43 @@
 					"response": []
 				},
 				{
+					"name": "Get Instances",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/instances",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"instances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Instance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/instance/CA:10:FB:DC:05:E9",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"instance",
+								"CA:10:FB:DC:05:E9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Genres",
 					"request": {
 						"method": "GET",
@@ -566,18 +576,918 @@
 					"response": []
 				},
 				{
-					"name": "Instance Info",
+					"name": "Get Posts",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "az",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "{{baseUrl}}/hardware/instance-info",
+							"raw": "{{baseUrl}}/hardware/posts?size=10&page=1",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"hardware",
-								"instance-info"
+								"posts"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "en",
+								"type": "text"
+							},
+							{
+								"key": "X-APP-KEY",
+								"value": "{{appKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"IN_SESSION\",\r\n    \"instance_id\": 3,\r\n    \"start\": \"2024-09-01 03:03:13\",\r\n    \"end\": \"2024-09-01 03:24:13\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hardware/schedule",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"schedule"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-APP-KEY",
+								"value": "{{appKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hardware/schedule/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"schedule",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Schedule",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "en",
+								"type": "text"
+							},
+							{
+								"key": "X-APP-KEY",
+								"value": "{{appKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/hardware/schedule/12",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"schedule",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tariff Plan",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hardware/tariff-plans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"tariff-plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Price",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    //\"device\": \"HTC\",\n    \"instance_id\": 6,\n    \"tariff\": \"MORNING\",\n    \"time\": \"MIN_15\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hardware/price",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hardware",
+								"price"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CRM Service",
+			"item": [
+				{
+					"name": "Shared",
+					"item": [
+						{
+							"name": "Auth check",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/crm/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"crm",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Instance Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/crm/instance-info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"crm",
+										"instance-info"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Customers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/crm/customers?trim=&size=10&page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"crm",
+								"customers"
+							],
+							"query": [
+								{
+									"key": "trim",
+									"value": ""
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customers U-Birthdays",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/crm//customers/upcoming-birthdays",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"crm",
+								"",
+								"customers",
+								"upcoming-birthdays"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Customer",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-APP-KEY",
+								"value": "{{appKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/crm/customers/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"crm",
+								"customers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customers",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "ru",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"birthday\": \"01.01.2000\",\n\t\"first_name\": \"First\",\n\t\"last_name\": \"Last\",\n\t\"contacts\": [\n\t\t{\n\t\t\t\"type\": \"telegram\",\n\t\t\t\"value\": \"eeee\"\n\t\t}\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/crm/customers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"crm",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customers",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"birthday\": \"01.01.2000\",\n\t\"first_name\": \"Firdddst\",\n\t\"last_name\": \"Last\",\n\t\"contacts\": [\n\t\t{\n\t\t\t\"type\": \"telegrasm\",\n\t\t\t\"value\": \"test\"\n\t\t}\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/crm/customers/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"crm",
+								"customers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Staff Service",
+			"item": [
+				{
+					"name": "Shared",
+					"item": [
+						{
+							"name": "Auth check",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/staff/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"staff",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Instance Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/staff/instance-info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"staff",
+										"instance-info"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Invoices",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    \"tariff\": \"MIN_15\",\n    \"queue\": false,\n    \"invoice_id\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/invoices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    \"schedule\": true,\n    //\"customer\": \"tesst\",\n    //\"invoice_id\": 12,\n    \"customer_id\": 2,\n    \"time\": \"MIN_15\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/sessions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    //\"queue\": false,\n    //\"customer\": \"tesst\",\n    //\"invoice_id\": 12,\n    \"customer_id\": 2,\n    \"tariff\": \"MIN_15\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/sessions/2/start",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"sessions",
+								"2",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Finish Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    //\"queue\": false,\n    //\"customer\": \"tesst\",\n    //\"invoice_id\": 12,\n    \"customer_id\": 2,\n    \"tariff\": \"MIN_15\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/sessions/24/finish",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"sessions",
+								"24",
+								"finish"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"3\",\n    \"serviced_by\": \"1\",\n    \"tariff\": \"MIN_15\",\n    \"queue\": false,\n    \"invoice_id\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/sessions/20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"sessions",
+								"20"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Session Discount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/staff/sessions/1/discount/14",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"sessions",
+								"1",
+								"discount",
+								"14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Session BY schedule ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-APP-KEY",
+								"value": "{{appKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    \"tariff\": \"MIN_15\",\n    \"queue\": false,\n    \"invoice_id\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/sessions/byScheduleId/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"sessions",
+								"byScheduleId",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Snacks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    \"tariff\": \"MIN_15\",\n    \"queue\": false,\n    \"invoice_id\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/snacks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"snacks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Snacks Deal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"snack_id\": \"2\",\n    \"quantity\": \"1\",\n    \"invoice_id\": 1,\n    //\"customer\": \"tesst\",\n    \"customer_id\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/snacks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"snacks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Make OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/staff/otp/make",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"otp",
+								"make"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit OTP",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-OTP-Identifier",
+								"value": "{{otpIdentifier}}",
+								"type": "text"
+							},
+							{
+								"key": "X-OTP-Code",
+								"value": "5659",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/staff/otp/submit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"otp",
+								"submit"
 							]
 						}
 					},
@@ -591,11 +1501,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/test",
+					"raw": "{{baseUrl}}/test",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"test"
 					]
@@ -604,6 +1513,16 @@
 			"response": []
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{bearerToken}}",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
