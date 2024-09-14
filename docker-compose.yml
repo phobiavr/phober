@@ -40,6 +40,29 @@ services:
         networks:
             - backend
 
+    sqlsrv:
+        container_name: sqlsrv
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=Password1*
+        ports:
+            - "8433:1433"
+        volumes:
+            - sqlsrv_data:/var/opt/mssql
+        networks:
+            - backend
+
+    adminer:
+        image: adminer:latest
+        container_name: adminer
+        environment:
+            - ADMINER_DEFAULT_SERVER=sqlsrv
+        ports:
+            - "8920:8080"
+        networks:
+            - backend
+
     phpmyadmin:
         platform: linux/x86_64
         image: phpmyadmin
@@ -56,6 +79,20 @@ services:
             - "8900:80"
         networks:
             - backend
+
+    pgadmin:
+        image: dpage/pgadmin4
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@example.com
+            PGADMIN_DEFAULT_PASSWORD: admin
+        ports:
+            - "8910:80"
+        depends_on:
+            - dbp
+        networks:
+            - backend
+        volumes:
+            - pgadmin_data:/var/lib/pgadmin
 
     adminpanel:
         build:
@@ -155,6 +192,7 @@ services:
         image: phober-php_8.1-apache
         container_name: notification-queue
         command: php artisan queue:work
+        restart: always
         environment:
             << : *common-env
         volumes:
@@ -198,6 +236,8 @@ services:
 volumes:
     dbdata:
     db-postgres-data:
+    pgadmin_data:
+    sqlsrv_data:
 
 networks:
     backend:
