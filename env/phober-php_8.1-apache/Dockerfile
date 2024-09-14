@@ -1,4 +1,4 @@
-FROM php:8.1.0RC1-apache
+FROM php:8.2-apache
 
 LABEL maintainer="Hikmat Abdukhaligov"
 
@@ -21,10 +21,11 @@ RUN apt-get update && apt-get install -y \
     libreadline-dev \
     libonig-dev \
     libxml2-dev \
+    libpq-dev \
     sudo \
     unzip \
     zip \
- && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache sockets \
+ && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache sockets \
  && rm -rf /var/lib/apt/lists/*
 
 # Configure Apache Document Root

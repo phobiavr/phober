@@ -26,6 +26,20 @@ services:
         networks:
             - backend
 
+    dbp:
+        image: postgres:13
+        environment:
+            POSTGRES_DB: database
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: password
+        volumes:
+            - ./env/postgres:/docker-entrypoint-initdb.d
+            - db-postgres-data:/var/lib/postgresql/data
+        ports:
+            - "8432:5432"
+        networks:
+            - backend
+
     phpmyadmin:
         platform: linux/x86_64
         image: phpmyadmin
@@ -183,6 +197,7 @@ services:
 
 volumes:
     dbdata:
+    db-postgres-data:
 
 networks:
     backend:
