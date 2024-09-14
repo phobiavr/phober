@@ -25,13 +25,23 @@ RUN apt-get update && apt-get install -y \
     sudo \
     unzip \
     zip \
- && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache sockets \
- && rm -rf /var/lib/apt/lists/*
+    gnupg2 \
+    apt-transport-https \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update && ACCEPT_EULA=Y apt-get install -y \
+        msodbcsql17 \
+        unixodbc-dev \
+        libgssapi-krb5-2 \
+    && pecl install sqlsrv pdo_sqlsrv \
+    && docker-php-ext-enable sqlsrv pdo_sqlsrv \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache sockets \
+    && rm -rf /var/lib/apt/lists/*
 
 # Configure Apache Document Root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
- && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # Enable Apache mod_rewrite and mod_headers
 RUN a2enmod rewrite headers
@@ -44,9 +54,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create a system group and user to run Composer and Artisan Commands
 RUN groupadd -g ${gid} ${user} \
- && useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user} \
- && mkdir -p /home/${user}/.composer \
- && chown -R ${user}:${user} /home/${user}
+    && useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user} \
+    && mkdir -p /home/${user}/.composer \
+    && chown -R ${user}:${user} /home/${user}
 
 # Set working directory
 WORKDIR /var/www/html
