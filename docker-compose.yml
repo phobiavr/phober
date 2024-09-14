@@ -134,7 +134,7 @@ services:
         image: phober-php_8.1-apache
         environment:
             << : *common-env
-            APP_URL: "http://localhost:8000/hardware"
+            APP_URL: "/hardware"
         volumes:
             - ./device-service:/var/www/html
             - ./media:/var/www/html/public/storage/media:ro
