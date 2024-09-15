@@ -7,6 +7,15 @@ ARG user=user
 ARG uid=1000
 ARG gid=1000
 
+# Oracle Instant Client Download links
+ENV INSTANTCLIENT "https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip"
+ENV INSTANTCLIENT_SDK "https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-sdk-linux.x64-21.12.0.0.0dbru.zip"
+ENV SQLPLUS "https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-sqlplus-linux.x64-21.12.0.0.0dbru.zip"
+
+# Oracle Instant Client ENV Variables
+ENV LD_LIBRARY_PATH "/opt/oracle/instantclient"
+ENV PATH "$PATH:$LD_LIBRARY_PATH"
+
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     curl \
@@ -22,6 +31,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libpq-dev \
+    libaio1 \
     sudo \
     unzip \
     zip \
@@ -36,6 +46,19 @@ RUN apt-get update && apt-get install -y \
     && pecl install sqlsrv pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache sockets \
+    && curl -L $INSTANTCLIENT -o /tmp/instantclient-basic.zip \
+    && curl -L $INSTANTCLIENT_SDK -o /tmp/instantclient-sdk.zip \
+    && curl -L $SQLPLUS -o /tmp/instantclient-sqlplus.zip \
+    && mkdir -p /opt/oracle \
+    && unzip /tmp/instantclient-basic.zip -d /opt/oracle/ \
+    && unzip /tmp/instantclient-sdk.zip -d /opt/oracle/ \
+    && unzip /tmp/instantclient-sqlplus.zip -d /opt/oracle/ \
+    && rm /tmp/instantclient-*.zip \
+    && mv /opt/oracle/instantclient_* /opt/oracle/instantclient \
+    && echo /opt/oracle/instantclient > /etc/ld.so.conf.d/oracleinstantclient.conf \
+    && ldconfig \
+    && echo 'instantclient,/opt/oracle/instantclient' | pecl install oci8 \
+    && docker-php-ext-enable oci8 \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure Apache Document Root
