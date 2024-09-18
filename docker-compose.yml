@@ -72,7 +72,10 @@ services:
         environment:
             MINIO_ACCESS_KEY: youraccesskey
             MINIO_SECRET_KEY: yoursecretkey
-        command: server /data
+        ports:
+            - "9000:9000" # MinIO API
+            - "9001:9001" # MinIO Web UI
+        command: server /data --console-address ":9001"
         volumes:
             - ./buckets:/data
         networks:
