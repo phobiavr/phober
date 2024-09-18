@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Route;
 use Shared\Clients\ConfigClient;
 
 Route::get('/instance-info', function () {
-    return response()->json([
-        'instance_id' => gethostname(),
-    ]);
+    return response()->json(['instance_id' => gethostname()]);
+});
+
+Route::get('/health', function () {
+    return response()->json(['status' => 'OK']);
 });
 
 Route::middleware('private')->group(function () {
