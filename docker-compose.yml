@@ -80,8 +80,8 @@ services:
         image: minio/minio
         container_name: minio
         environment:
-            MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
-            MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
+            MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
+            MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
         ports:
             - "${MINIO_WEB_UI_PORT:-9100}:80"
         command: server /data --console-address ":80"
@@ -100,8 +100,8 @@ services:
             - "${ADMIN_PANEL_PORT:-8100}:80"
         environment:
             << : *common-env
-            AWS_ACCESS_KEY_ID: youraccesskey
-            AWS_SECRET_ACCESS_KEY: yoursecretkey
+            AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
+            AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
             AWS_DEFAULT_REGION: us-east-1
             AWS_BUCKET: media
             AWS_URL: "${API_GATEWAY_HOST:-http://localhost}:${API_GATEWAY_PORT:-8000}/s3"
