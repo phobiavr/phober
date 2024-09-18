@@ -66,44 +66,17 @@ services:
         networks:
             - backend
 
-    adminer:
-        image: adminer:latest
-        container_name: adminer
-        ports:
-            - "8920:8080"
-        networks:
-            - backend
-
-    phpmyadmin:
-        platform: linux/x86_64
-        image: phpmyadmin
-        container_name: phpmyadmin
-        links:
-            - db_mysql
-        depends_on:
-            - db_mysql
+    minio:
+        image: minio/minio
+        container_name: minio
         environment:
-            PMA_HOST: db_mysql
-            PMA_PORT: 3306
-            PMA_ARBITRARY: 1
-        ports:
-            - "8900:80"
-        networks:
-            - backend
-
-    pgadmin:
-        image: dpage/pgadmin4
-        environment:
-            PGADMIN_DEFAULT_EMAIL: admin@example.com
-            PGADMIN_DEFAULT_PASSWORD: admin
-        ports:
-            - "8910:80"
-        depends_on:
-            - db_postgres
-        networks:
-            - backend
+            MINIO_ACCESS_KEY: youraccesskey
+            MINIO_SECRET_KEY: yoursecretkey
+        command: server /data
         volumes:
-            - pgadmin_data:/var/lib/pgadmin
+            - ./buckets:/data
+        networks:
+            - backend
 
     adminpanel:
         build:
@@ -115,11 +88,15 @@ services:
             - "8100:80"
         environment:
             << : *common-env
-            APP_URL: "http://localhost:8100"
+            AWS_ACCESS_KEY_ID: youraccesskey
+            AWS_SECRET_ACCESS_KEY: yoursecretkey
+            AWS_DEFAULT_REGION: us-east-1
+            AWS_BUCKET: media
+            AWS_URL: 'http://localhost:8000/s3/media'
+            AWS_ENDPOINT: 'http://minio:9000'
+            AWS_USE_PATH_STYLE_ENDPOINT: true
         volumes:
             - ./adminpanel:/var/www/html
-            - ./media:/var/www/html/public/storage/media
-            - ./media:/var/www/html/storage/app/public/media
             - ./shared:/var/www/html/shared
         depends_on:
             - db_mysql
@@ -146,17 +123,22 @@ services:
         environment:
             << : *common-env
             APP_URL: "/hardware"
+            AWS_ACCESS_KEY_ID: youraccesskey
+            AWS_SECRET_ACCESS_KEY: yoursecretkey
+            AWS_DEFAULT_REGION: us-east-1
+            AWS_BUCKET: media
+            AWS_URL: '/s3/media'
+            AWS_ENDPOINT: 'http://minio:9000'
+            AWS_USE_PATH_STYLE_ENDPOINT: true
         volumes:
             - ./device-service:/var/www/html
-            - ./media:/var/www/html/public/storage/media:ro
-            - ./media:/var/www/html/storage/app/public/media:ro
             - ./shared:/var/www/html/shared
         depends_on:
             - db_postgres
         networks:
             - backend
         deploy:
-            replicas: 3
+            replicas: 1
         entrypoint: sh -c "php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
 
     crm-service:
@@ -247,7 +229,6 @@ volumes:
     db_postgres_data:
     db_oracle_data:
     db_mssql_data:
-    pgadmin_data:
 
 networks:
     backend:
