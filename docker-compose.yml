@@ -7,8 +7,8 @@ x-common-env: &common-env
     APACHE_RUN_DIR: /var/run/apache2
     APACHE_PID_FILE: /var/run/apache2/apache2.pid
     APACHE_LOCK_DIR: /var/lock/apache2
-    APP_KEY: base64:10GvWo3QVZLvODVr0rKxufpyI2rUVmLqbWv6dfEWs4U=
-    APP_TIMEZONE: Asia/Baku
+    APP_KEY: ${APP_KEY}
+    APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
 
 x-common-healthcheck: &common-healthcheck
     test: [ "CMD", "curl", "-f", "http://localhost/health" ]
@@ -18,7 +18,10 @@ x-common-healthcheck: &common-healthcheck
     timeout: 20s
 
 x-shared-volume: &shared-volume
-    ./shared:/var/www/html/shared
+    ./shared:/var/www/html/shared:ro
+
+x-scripts-volume: &scripts-volume
+    ./env/scripts:/scripts:ro
 
 services:
     db_mysql:
@@ -26,9 +29,9 @@ services:
         image: mysql:8.0
         container_name: db_mysql
         ports:
-            - "8306:3306"
+            - "${MYSQL_PUBLIC_PORT:-8306}:3306"
         environment:
-            MYSQL_ROOT_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
             SERVICE_TAGS: dev
             SERVICE_NAME: mysql
         volumes:
@@ -40,14 +43,14 @@ services:
         image: postgres:13
         container_name: db_postgres
         environment:
-            POSTGRES_DB: database
-            POSTGRES_USER: user
-            POSTGRES_PASSWORD: password
+            POSTGRES_DB: ${POSTGRES_DB:-database}
+            POSTGRES_USER: ${POSTGRES_USER:-user}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
         volumes:
             - ./env/postgres:/docker-entrypoint-initdb.d
             - db_postgres_data:/var/lib/postgresql/data
         ports:
-            - "8432:5432"
+            - "${POSTGRES_PUBLIC_PORT:-8432}:5432"
         networks:
             - private
 
@@ -55,10 +58,10 @@ services:
         container_name: db_mssql
         image: mcr.microsoft.com/mssql/server:2022-latest
         environment:
-            - ACCEPT_EULA=Y
-            - MSSQL_SA_PASSWORD=Password1*
+            ACCEPT_EULA: Y
+            MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Password1*}
         ports:
-            - "8433:1433"
+            - "${MSSQL_PUBLIC_PORT:-8433}:1433"
         volumes:
             - db_mssql_data:/var/opt/mssql
         networks:
@@ -68,9 +71,9 @@ services:
         container_name: oracle
         image: gvenzl/oracle-free:latest
         environment:
-            ORACLE_PASSWORD: Password1*
+            ORACLE_PASSWORD: ${ORACLE_PASSWORD:-Password1*}
         ports:
-            - "8521:1521"
+            - "${ORACLE_PUBLIC_PORT:-8521}:1521"
         volumes:
             - db_oracle_data:/opt/oracle/oradata
         networks:
@@ -109,13 +112,14 @@ services:
             AWS_USE_PATH_STYLE_ENDPOINT: true
         volumes:
             - *shared-volume
+            - *scripts-volume
             - ./adminpanel:/var/www/html
         depends_on:
             - db_mysql
         networks:
             - private
             - public
-        entrypoint: sh -c "apache2 -D FOREGROUND"
+        entrypoint: [ "/scripts/start-apache.sh"]
         healthcheck: *common-healthcheck
 
     config-server:
@@ -125,12 +129,13 @@ services:
             << : *common-env
         volumes:
             - *shared-volume
+            - *scripts-volume
             - ./config-server:/var/www/html
         depends_on:
             - db_mysql
         networks:
             - private
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'config-server' && apache2 -D FOREGROUND"
+        entrypoint: [ "/scripts/start-laravel-service.sh", "config-server"]
         healthcheck: *common-healthcheck
 
     device-service:
@@ -147,6 +152,7 @@ services:
             AWS_USE_PATH_STYLE_ENDPOINT: true
         volumes:
             - *shared-volume
+            - *scripts-volume
             - ./device-service:/var/www/html
         depends_on:
             - db_postgres
@@ -154,7 +160,7 @@ services:
             - private
         deploy:
             replicas: 1
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'device-service' && apache2 -D FOREGROUND"
+        entrypoint: [ "/scripts/start-laravel-service.sh", "device-service"]
         healthcheck: *common-healthcheck
 
     crm-service:
@@ -164,12 +170,13 @@ services:
             << : *common-env
         volumes:
             - *shared-volume
+            - *scripts-volume
             - ./crm-service:/var/www/html
         depends_on:
             - db_oracle
         networks:
             - private
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'crm-service' && apache2 -D FOREGROUND"
+        entrypoint: [ "/scripts/start-laravel-service.sh", "crm-service"]
         healthcheck: *common-healthcheck
 
     staff-service:
@@ -179,12 +186,13 @@ services:
             << : *common-env
         volumes:
             - *shared-volume
+            - *scripts-volume
             - ./staff-service:/var/www/html
         depends_on:
             - db_mssql
         networks:
             - private
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'staff-service' && apache2 -D FOREGROUND"
+        entrypoint: [ "/scripts/start-laravel-service.sh", "staff-service"]
         healthcheck: *common-healthcheck
 
     notification-server:
@@ -194,10 +202,11 @@ services:
             << : *common-env
         volumes:
             - *shared-volume
+            - *scripts-volume
             - ./notification-server:/var/www/html
         networks:
             - private
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'notification-server' && apache2 -D FOREGROUND"
+        entrypoint: [ "/scripts/start-laravel-service.sh", "notification-server"]
         healthcheck: *common-healthcheck
 
     notification-queue:
@@ -222,12 +231,13 @@ services:
             << : *common-env
         volumes:
             - *shared-volume
+            - *scripts-volume
             - ./auth-server:/var/www/html
         depends_on:
             - db_mssql
         networks:
             - private
-        entrypoint: sh -c "php /var/www/html/artisan hostname:update 'auth-server' && apache2 -D FOREGROUND"
+        entrypoint: [ "/scripts/start-laravel-service.sh", "auth-server"]
         healthcheck: *common-healthcheck
 
     api-gateway:
