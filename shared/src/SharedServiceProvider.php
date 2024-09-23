@@ -25,10 +25,8 @@ class SharedServiceProvider extends ServiceProvider {
      * @return void
      */
     public function register(): void {
-        try {
+        if (config()->has('telescope')) {
             Telescope::ignoreMigrations();
-        } catch (\Throwable $exception) {
-            error_log($exception->getMessage());
         }
     }
 
