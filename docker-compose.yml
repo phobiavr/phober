@@ -96,8 +96,8 @@ services:
     adminpanel:
         build:
             context: ./
-            dockerfile: ./env/phober-php_8.1-apache/Dockerfile
-        image: phober-php_8.1-apache
+            dockerfile: ./env/phober-php/Dockerfile
+        image: phober-php
         container_name: adminpanel
         ports:
             - "${ADMIN_PANEL_PORT:-8100}:80"
@@ -123,7 +123,7 @@ services:
         healthcheck: *common-healthcheck
 
     config-server:
-        image: phober-php_8.1-apache
+        image: phober-php
         container_name: config-server
         environment:
             << : *common-env
@@ -139,7 +139,7 @@ services:
         healthcheck: *common-healthcheck
 
     device-service:
-        image: phober-php_8.1-apache
+        image: phober-php
         environment:
             << : *common-env
             APP_URL: "/hardware"
@@ -164,7 +164,7 @@ services:
         healthcheck: *common-healthcheck
 
     crm-service:
-        image: phober-php_8.1-apache
+        image: phober-php
         container_name: crm-service
         environment:
             << : *common-env
@@ -180,7 +180,7 @@ services:
         healthcheck: *common-healthcheck
 
     staff-service:
-        image: phober-php_8.1-apache
+        image: phober-php
         container_name: staff-service
         environment:
             << : *common-env
@@ -196,7 +196,7 @@ services:
         healthcheck: *common-healthcheck
 
     notification-server:
-        image: phober-php_8.1-apache
+        image: phober-php
         container_name: notification-server
         environment:
             << : *common-env
@@ -210,7 +210,7 @@ services:
         healthcheck: *common-healthcheck
 
     notification-queue:
-        image: phober-php_8.1-apache
+        image: phober-php
         container_name: notification-queue
         command: php artisan queue:work
         restart: always
@@ -225,7 +225,7 @@ services:
             - private
 
     auth-server:
-        image: phober-php_8.1-apache
+        image: phober-php
         container_name: auth-server
         environment:
             << : *common-env
@@ -273,26 +273,22 @@ services:
             - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
         volumes:
             - elasticsearch_data:/usr/share/elasticsearch/data
-        ports:
-            - "9200:9200"
         networks:
             - private
 
     logstash:
         image: logstash:7.17.1
         container_name: logstash
-        ports:
-            - "5044:5044"  # For Beats input
         networks:
             - private
         volumes:
-            - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+            - ./env/elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
 
     kibana:
         image: kibana:7.17.1
         container_name: kibana
         ports:
-            - "5601:5601"
+            - "${KIBANA_PORT:-8601}:5601"
         networks:
             - private
 
