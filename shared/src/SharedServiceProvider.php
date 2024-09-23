@@ -6,6 +6,7 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Telescope\Telescope;
 use Shared\Clients\ConfigClient;
@@ -25,8 +26,10 @@ class SharedServiceProvider extends ServiceProvider {
      * @return void
      */
     public function register(): void {
-        if (config()->has('telescope')) {
+        try {
             Telescope::ignoreMigrations();
+        } catch (\Throwable $exception) {
+            Log::error('Error in Telescope migration:', ['message' => $exception->getMessage()]);
         }
     }
 

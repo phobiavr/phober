@@ -109,7 +109,7 @@ services:
             AWS_BUCKET: media
             AWS_URL: "${API_GATEWAY_HOST:-http://localhost}:${API_GATEWAY_PORT:-8000}/s3"
             AWS_ENDPOINT: 'http://minio:9000'
-            AWS_USE_PATH_STYLE_ENDPOINT: true
+            AWS_USE_PATH_STYLE_ENDPOINT: 'true'
         volumes:
             - *shared-volume
             - *scripts-volume
@@ -149,7 +149,7 @@ services:
             AWS_BUCKET: media
             AWS_URL: '/s3/media'
             AWS_ENDPOINT: 'http://minio:9000'
-            AWS_USE_PATH_STYLE_ENDPOINT: true
+            AWS_USE_PATH_STYLE_ENDPOINT: 'true'
         volumes:
             - *shared-volume
             - *scripts-volume
@@ -265,11 +265,43 @@ services:
             - crm-service
             - staff-service
 
+    elasticsearch:
+        image: elasticsearch:7.17.1
+        container_name: elasticsearch
+        environment:
+            - discovery.type=single-node
+            - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+        volumes:
+            - elasticsearch_data:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+        networks:
+            - private
+
+    logstash:
+        image: logstash:7.17.1
+        container_name: logstash
+        ports:
+            - "5044:5044"  # For Beats input
+        networks:
+            - private
+        volumes:
+            - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+    kibana:
+        image: kibana:7.17.1
+        container_name: kibana
+        ports:
+            - "5601:5601"
+        networks:
+            - private
+
 volumes:
     db_mysql_data:
     db_postgres_data:
     db_oracle_data:
     db_mssql_data:
+    elasticsearch_data:
 
 networks:
     private:
