@@ -238,7 +238,12 @@ services:
         networks:
             - private
         entrypoint: [ "/scripts/start-laravel-service.sh", "auth-server"]
-        healthcheck: *common-healthcheck
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost/up" ]
+            interval: 60s
+            retries: 5
+            start_period: 60s
+            timeout: 20s
 
     api-gateway:
         image: nginx:latest
