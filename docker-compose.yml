@@ -214,7 +214,7 @@ services:
         networks:
             - private
         entrypoint: [ "/scripts/start-laravel-service.sh", "notification-server"]
-        healthcheck: *common-healthcheck
+        healthcheck: *common-healthcheck-v2
 
     notification-queue:
         image: phober-php
