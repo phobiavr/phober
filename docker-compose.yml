@@ -197,11 +197,12 @@ services:
             - *scripts-volume
             - ./staff-service:/var/www/html
         depends_on:
+            - db_mysql
             - db_mssql
         networks:
             - private
         entrypoint: [ "/scripts/start-laravel-service.sh", "staff-service"]
-        healthcheck: *common-healthcheck
+        healthcheck: *common-healthcheck-v2
 
     notification-server:
         image: phober-php
