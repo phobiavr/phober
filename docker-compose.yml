@@ -162,13 +162,14 @@ services:
             - *scripts-volume
             - ./device-service:/var/www/html
         depends_on:
+            - db_mysql
             - db_postgres
         networks:
             - private
         deploy:
             replicas: 1
         entrypoint: [ "/scripts/start-laravel-service.sh", "device-service"]
-        healthcheck: *common-healthcheck
+        healthcheck: *common-healthcheck-v2
 
     crm-service:
         image: phober-php
