@@ -83,6 +83,55 @@
 					"response": []
 				},
 				{
+					"name": "Get token Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"if(response.token) {",
+									"    pm.environment.set('bearerToken', response.token);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@site.com\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/authenticate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Check authentication validity",
 					"request": {
 						"auth": {
@@ -544,14 +593,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/hardware/instance/CA:10:FB:DC:05:E9",
+							"raw": "{{baseUrl}}/hardware/instance/2",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"hardware",
 								"instance",
-								"CA:10:FB:DC:05:E9"
+								"2"
 							]
 						}
 					},
@@ -1026,6 +1075,52 @@
 					]
 				},
 				{
+					"name": "Employees",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    \"tariff\": \"MIN_15\",\n    \"queue\": false,\n    \"invoice_id\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/employees",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Invoices",
 					"event": [
 						{
@@ -1066,6 +1161,94 @@
 							"path": [
 								"staff",
 								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice Payed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    //\"method\": \"CARD\"\n    \"method\": {\"CARD\": 5, \"BONUS\": 5, \"CASH\": 5}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/invoices/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"invoices",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const otpIdentifier = pm.response.headers.get('X-OTP-Identifier');",
+									"",
+									"if (otpIdentifier) {",
+									"    pm.environment.set('otpIdentifier', otpIdentifier);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instance_id\": \"2\",\n    \"serviced_by\": \"1\",\n    \"tariff\": \"MIN_15\",\n    \"queue\": false,\n    \"invoice_id\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/staff/invoices/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"staff",
+								"invoices",
+								"1"
 							]
 						}
 					},
