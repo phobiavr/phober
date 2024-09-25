@@ -1,3 +1,4 @@
 .idea
 /buckets/.minio.sys/
 .env
+/buckets/media/
