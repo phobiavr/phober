@@ -180,11 +180,12 @@ services:
             - *scripts-volume
             - ./crm-service:/var/www/html
         depends_on:
+            - db_mysql
             - db_oracle
         networks:
             - private
         entrypoint: [ "/scripts/start-laravel-service.sh", "crm-service"]
-        healthcheck: *common-healthcheck
+        healthcheck: *common-healthcheck-v2
 
     staff-service:
         image: phober-php
@@ -211,6 +212,8 @@ services:
             - *shared-laravel-volume
             - *scripts-volume
             - ./notification-server:/var/www/html
+        depends_on:
+            - db_mysql
         networks:
             - private
         entrypoint: [ "/scripts/start-laravel-service.sh", "notification-server"]
