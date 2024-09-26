@@ -10,13 +10,6 @@ x-common-env: &common-env
     APP_KEY: ${APP_KEY}
     APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
 
-x-common-healthcheck: &common-healthcheck
-    test: [ "CMD", "curl", "-f", "http://localhost/health" ]
-    interval: 60s
-    retries: 5
-    start_period: 60s
-    timeout: 20s
-
 x-common-healthcheck-v2: &common-healthcheck-v2
     test: [ "CMD", "curl", "-f", "http://localhost/up" ]
     interval: 60s
@@ -32,16 +25,16 @@ x-scripts-volume: &scripts-volume
 
 services:
     db_mysql:
-        platform: linux/x86_64
         image: mysql:8.0
         container_name: db_mysql
-        ports:
-            - "${MYSQL_PUBLIC_PORT:-8306}:3306"
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
             SERVICE_TAGS: dev
             SERVICE_NAME: mysql
+        ports:
+            - "${MYSQL_PUBLIC_PORT:-8306}:3306"
         volumes:
+            - ./env/mysql/init-db.sql:/var/opt/mysql/init-db.sql
             - db_mysql_data:/var/lib/mysql
         networks:
             - private
@@ -53,30 +46,31 @@ services:
             POSTGRES_DB: ${POSTGRES_DB:-database}
             POSTGRES_USER: ${POSTGRES_USER:-user}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+        ports:
+            - "${POSTGRES_PUBLIC_PORT:-8432}:5432"
         volumes:
             - ./env/postgres:/docker-entrypoint-initdb.d
             - db_postgres_data:/var/lib/postgresql/data
-        ports:
-            - "${POSTGRES_PUBLIC_PORT:-8432}:5432"
         networks:
             - private
 
     db_mssql:
-        container_name: db_mssql
         image: mcr.microsoft.com/mssql/server:2022-latest
+        container_name: db_mssql
         environment:
             ACCEPT_EULA: Y
             MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Password1*}
         ports:
             - "${MSSQL_PUBLIC_PORT:-8433}:1433"
         volumes:
+            - ./env/sqlsrv/init-db.sql:/var/opt/mssql/init-db.sql
             - db_mssql_data:/var/opt/mssql
         networks:
             - private
 
     db_oracle:
-        container_name: oracle
         image: gvenzl/oracle-free:latest
+        container_name: oracle
         environment:
             ORACLE_PASSWORD: ${ORACLE_PASSWORD:-Password1*}
         ports:
@@ -101,13 +95,11 @@ services:
             - private
 
     adminpanel:
+        image: phober-php
         build:
             context: ./
             dockerfile: ./env/phober-php/Dockerfile
-        image: phober-php
         container_name: adminpanel
-        ports:
-            - "${ADMIN_PANEL_PORT:-8100}:80"
         environment:
             << : *common-env
             AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
@@ -117,6 +109,8 @@ services:
             AWS_URL: "${API_GATEWAY_HOST:-https://localhost}:${API_GATEWAY_PORT:-8000}/s3"
             AWS_ENDPOINT: 'http://minio:9000'
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
+        ports:
+            - "${ADMIN_PANEL_PORT:-8100}:80"
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
@@ -126,8 +120,7 @@ services:
         networks:
             - private
             - public
-        entrypoint: [ "/scripts/start-apache.sh"]
-        healthcheck: *common-healthcheck
+        entrypoint: ["/scripts/start-apache.sh"]
 
     config-server:
         image: phober-php
@@ -142,11 +135,12 @@ services:
             - db_mysql
         networks:
             - private
-        entrypoint: [ "/scripts/start-laravel-service.sh", "config-server"]
+        entrypoint: ["/scripts/start-laravel-service.sh", "config-server"]
         healthcheck: *common-healthcheck-v2
 
     device-service:
         image: phober-php
+        container_name: device-service
         environment:
             << : *common-env
             APP_URL: "/hardware"
@@ -162,13 +156,12 @@ services:
             - *scripts-volume
             - ./device-service:/var/www/html
         depends_on:
-            - db_mysql
             - db_postgres
         networks:
             - private
         deploy:
             replicas: 1
-        entrypoint: [ "/scripts/start-laravel-service.sh", "device-service"]
+        entrypoint: ["/scripts/start-laravel-service.sh", "device-service"]
         healthcheck: *common-healthcheck-v2
 
     crm-service:
@@ -181,11 +174,10 @@ services:
             - *scripts-volume
             - ./crm-service:/var/www/html
         depends_on:
-            - db_mysql
             - db_oracle
         networks:
             - private
-        entrypoint: [ "/scripts/start-laravel-service.sh", "crm-service"]
+        entrypoint: ["/scripts/start-laravel-service.sh", "crm-service"]
         healthcheck: *common-healthcheck-v2
 
     staff-service:
@@ -198,11 +190,10 @@ services:
             - *scripts-volume
             - ./staff-service:/var/www/html
         depends_on:
-            - db_mysql
             - db_mssql
         networks:
             - private
-        entrypoint: [ "/scripts/start-laravel-service.sh", "staff-service"]
+        entrypoint: ["/scripts/start-laravel-service.sh", "staff-service"]
         healthcheck: *common-healthcheck-v2
 
     notification-server:
@@ -218,7 +209,7 @@ services:
             - db_mysql
         networks:
             - private
-        entrypoint: [ "/scripts/start-laravel-service.sh", "notification-server"]
+        entrypoint: ["/scripts/start-laravel-service.sh", "notification-server"]
         healthcheck: *common-healthcheck-v2
 
     notification-queue:
@@ -226,6 +217,10 @@ services:
         container_name: notification-queue
         command: php artisan queue:work
         restart: always
+        deploy:
+            restart_policy:
+                condition: any
+                delay: 15s
         environment:
             << : *common-env
         volumes:
@@ -250,7 +245,7 @@ services:
             - db_mysql
         networks:
             - private
-        entrypoint: [ "/scripts/start-laravel-service.sh", "auth-server"]
+        entrypoint: ["/scripts/start-laravel-service.sh", "auth-server"]
         healthcheck: *common-healthcheck-v2
 
     api-gateway:
