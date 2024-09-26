@@ -9,9 +9,9 @@
 
 ## Technologies
 
-- Laravel v9.2
-- PHP v8.0
-- MySQL
+- Laravel v11.9
+- PHP v8.2.23
+- MySQL / Postgres / Microsoft SQL / Oracle / SQLite
 - Docker & Docker Compose
 
 ## Introduction
@@ -27,9 +27,10 @@
 The `Api-Gateway` simplifies client-side interactions by providing a single entry point to access multiple backend services. It abstracts the complexity of service locations and configurations, enhancing application scalability and management.
 
 **Routing Structure**: The `Api-Gateway` routes requests to different microservices based on the URL path:
-- `/notification/`: Routes to the notification server (`notification-server`).
 - `/auth/`: Routes to the authentication server (`auth-server`).
 - `/hardware/`: Routes to the device service (`device-service`).
+- `/crm/`: Routes to the CRM service (`crm-service`).
+- `/staff/`: Routes to the staff service (`staff-service`).
 
 **Note:** Refer to the provided Nginx configuration file (`env/api-gateway/nginx.conf`) for detailed setup and routing rules.
 
@@ -81,18 +82,24 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    <details>
       <summary>Notes</summary>
 
-      This is required to download the `laravel/nova` package.
+   This is required to download the `laravel/nova` package.
 
-      You can create this file by copying the `auth.json.example` template provided in the project directory and then adding your GitHub credentials.
+   You can create this file by copying the `auth.json.example` template provided in the project directory and then adding your GitHub credentials.
 
-      For guidance on creating a GitHub personal access token, refer to [this guide](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+   For guidance on creating a GitHub personal access token, refer to [this guide](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
    </details>
-
 
 4. Build and start the Docker containers:
     ```bash
     docker-compose up -d
     ```
+
+5. Run the task automation script to initialize databases, services, and run migrations:
+    ```bash
+    ./setup.sh
+    ```
+
+   You will be prompted to select which tasks to execute, including database initialization, configuration updates, and migrations.
 
 ## Postman Collection
 
