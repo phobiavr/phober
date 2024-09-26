@@ -65,17 +65,7 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     git submodule update --remote --merge
     ```
 
-3. Copy the `.env.example` file to `.env` in each submodule directory:
-    ```bash
-    cp adminpanel/.env.example adminpanel/.env
-    cp config-server/.env.example config-server/.env
-    cp device-service/.env.example device-service/.env
-    cp crm-service/.env.example crm-service/.env
-    cp notification-server/.env.example notification-server/.env
-    cp auth-server/.env.example auth-server/.env
-    ```
-
-4. Ensure you have the `auth.json` file configured in your `adminpanel` directory:
+3. Ensure you have the `auth.json` file configured in your `adminpanel` directory:
     ```bash
     cp adminpanel/auth.json.example adminpanel/auth.json
     ```
@@ -99,52 +89,8 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
    </details>
 
 
-5. Build and start the Docker containers using the startup configuration:
+4. Build and start the Docker containers:
     ```bash
-    docker-compose -f docker-compose-startup.yml up -d
-    ```
-
-   <details>
-      <summary>Notes</summary>
-
-      This step initializes the Docker containers according to the startup configuration and automatically runs composer install to install PHP dependencies for all services.
-
-      Run the command without the `-d` flag initially to monitor the logs and ensure everything is running smoothly. Once you have verified that the setup is working as expected, you can run the command in detached mode:
-
-      After this step, you'll have the core dependencies installed and your database populated with initial data for the adminpanel.
-   </details>
-
-
-6. Initialize Database Tables and Seed Initial Data for `adminpanel`:
-
-    ```bash
-    docker-compose exec adminpanel php artisan migrate --seed
-    ```
-
-7. Run the `config-client:update` command for specific services:
-    ```bash
-    docker-compose exec notification-server php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
-    docker-compose exec auth-server php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
-    docker-compose exec device-service php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
-    docker-compose exec crm-service php /var/www/html/artisan config-client:update --custom-env-file=.env.shared
-    ```
-
-   <details>
-      <summary>Notes</summary>
-
-      This command updates each service's configuration based on dynamic values from the `config-server`.
-   </details>
-
-
-8. Run the `storage:link` command for the adminpanel and device-service:
-    ```bash
-    docker-compose exec adminpanel php artisan storage:link
-    docker-compose exec device-service php artisan storage:link
-    ```
-
-9. Shut down all Docker containers after the initial setup and before start the full application stack:
-    ```bash
-    docker-compose down
     docker-compose up -d
     ```
 

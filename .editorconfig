@@ -14,7 +14,6 @@ ij_any_method_brace_style = end_of_line
 ### PHP Styles ###
 [{*.ctp,*.hphp,*.inc,*.module,*.php,*.php4,*.php5,*.phtml}]
 ij_php_space_after_type_cast = true
-ij_php_align_key_value_pairs = true
 
 [*.md]
 trim_trailing_whitespace = false
