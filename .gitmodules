@@ -21,4 +21,4 @@
 	url = https://github.com/phobiavr/phober-staff-service.git
 [submodule "shared/laravel-common"]
 	path = shared/laravel-common
-	url = git@github.com:phobiavr/phober-laravel-common.git
+	url = https://github.com/phobiavr/phober-laravel-common.git
