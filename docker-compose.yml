@@ -217,10 +217,6 @@ services:
         container_name: notification-queue
         command: php artisan queue:work
         restart: always
-        deploy:
-            restart_policy:
-                condition: any
-                delay: 15s
         environment:
             << : *common-env
         volumes:
