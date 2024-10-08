@@ -122,6 +122,31 @@ services:
             - public
         entrypoint: ["/scripts/start-apache.sh"]
 
+    adminpanel-2:
+        image: phober-php
+        container_name: adminpanel-2
+        environment:
+            << : *common-env
+            AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
+            AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
+            AWS_DEFAULT_REGION: us-east-1
+            AWS_BUCKET: media
+            AWS_URL: "${API_GATEWAY_HOST:-https://localhost}:${API_GATEWAY_PORT:-8000}/s3"
+            AWS_ENDPOINT: 'http://minio:9000'
+            AWS_USE_PATH_STYLE_ENDPOINT: 'true'
+        ports:
+            - "8200:80"
+        volumes:
+            - *shared-laravel-volume
+            - *scripts-volume
+            - ./adminpanel-2:/var/www/html
+        depends_on:
+            - db_mysql
+        networks:
+            - private
+            - public
+        entrypoint: ["/scripts/start-apache.sh"]
+
     config-server:
         image: phober-php
         container_name: config-server
