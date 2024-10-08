@@ -22,6 +22,3 @@
 [submodule "shared/laravel-common"]
 	path = shared/laravel-common
 	url = https://github.com/phobiavr/phober-laravel-common.git
-[submodule "adminpanel-2"]
-	path = adminpanel-2
-	url = https://github.com/phobiavr/phober-adminpanel-2.git
