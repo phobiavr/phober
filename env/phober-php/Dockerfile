@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libpq-dev \
     libaio1 \
+    libzip-dev \
     sudo \
     unzip \
     zip \
@@ -45,7 +46,7 @@ RUN apt-get update && apt-get install -y \
         libgssapi-krb5-2 \
     && pecl install sqlsrv pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache sockets \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache sockets zip \
     && curl -L $INSTANTCLIENT -o /tmp/instantclient-basic.zip \
     && curl -L $INSTANTCLIENT_SDK -o /tmp/instantclient-sdk.zip \
     && curl -L $SQLPLUS -o /tmp/instantclient-sqlplus.zip \
