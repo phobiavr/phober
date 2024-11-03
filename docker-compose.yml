@@ -20,6 +20,9 @@ x-common-healthcheck-v2: &common-healthcheck-v2
 x-shared-laravel-volume: &shared-laravel-volume
     ./shared/laravel-common:/var/www/html/shared:ro
 
+x-shared-laravel-volume-2: &shared-laravel-volume-2
+    ./shared/nova-action-button-selectors:/var/www/html/shared-2:ro
+
 x-scripts-volume: &scripts-volume
     ./env/scripts:/scripts:ro
 
@@ -138,6 +141,7 @@ services:
             - "8200:80"
         volumes:
             - *shared-laravel-volume
+            - *shared-laravel-volume-2
             - *scripts-volume
             - ./adminpanel-2:/var/www/html
         depends_on:
