@@ -241,7 +241,6 @@ services:
         image: phober-php
         container_name: notification-queue
         command: php artisan queue:work
-        restart: always
         environment:
             << : *common-env
         volumes:
