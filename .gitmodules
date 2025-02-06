@@ -1,34 +1,33 @@
-[submodule "adminpanel"]
+[submodule "services/adminpanel"]
 	path = services/adminpanel
 	url = https://github.com/phobiavr/phober-adminpanel.git
-[submodule "adminpanel-2"]
+[submodule "services/adminpanel-2"]
 	path = services/adminpanel-2
 	url = https://github.com/phobiavr/phober-adminpanel-2.git
-
-[submodule "auth-server"]
+[submodule "services/auth-server"]
 	path = services/auth-server
 	url = https://github.com/phobiavr/phober-auth-server.git
-[submodule "device-service"]
+[submodule "services/device-service"]
 	path = services/device-service
 	url = https://github.com/phobiavr/phober-device-service.git
-[submodule "config-server"]
+[submodule "services/config-server"]
 	path = services/config-server
 	url = https://github.com/phobiavr/phober-config-server.git
-[submodule "notification-server"]
+[submodule "services/notification-server"]
 	path = services/notification-server
 	url = https://github.com/phobiavr/phober-notification-server.git
-[submodule "crm-service"]
+[submodule "services/crm-service"]
 	path = services/crm-service
 	url = https://github.com/phobiavr/phober-crm-service.git
-[submodule "staff-service"]
+[submodule "services/staff-service"]
 	path = services/staff-service
 	url = https://github.com/phobiavr/phober-staff-service.git
 [submodule "shared/laravel-common"]
 	path = shared/laravel-common
 	url = https://github.com/phobiavr/phober-laravel-common.git
-[submodule "media"]
-	path = media
-	url = https://github.com/phobiavr/phober-media.git
 [submodule "buckets"]
 	path = buckets
 	url = https://github.com/phobiavr/phober-buckets.git
+; [submodule "media"]
+; 	path = media
+; 	url = https://github.com/phobiavr/phober-media.git
