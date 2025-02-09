@@ -1,9 +1,6 @@
 [submodule "services/adminpanel"]
 	path = services/adminpanel
 	url = https://github.com/phobiavr/phober-adminpanel.git
-[submodule "services/adminpanel-2"]
-	path = services/adminpanel-2
-	url = https://github.com/phobiavr/phober-adminpanel-2.git
 [submodule "services/auth-server"]
 	path = services/auth-server
 	url = https://github.com/phobiavr/phober-auth-server.git

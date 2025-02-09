@@ -20,9 +20,6 @@ x-common-healthcheck-v2: &common-healthcheck-v2
 x-shared-laravel-volume: &shared-laravel-volume
     ./shared/laravel-common:/var/www/html/shared:ro
 
-x-shared-laravel-volume-2: &shared-laravel-volume-2
-    ./shared/nova-action-button-selectors:/var/www/html/shared-2:ro
-
 x-scripts-volume: &scripts-volume
     ./env/scripts:/scripts:ro
 
@@ -117,33 +114,7 @@ services:
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
-            - ./adminpanel:/var/www/html
-        depends_on:
-            - db_mysql
-        networks:
-            - private
-            - public
-        entrypoint: ["/scripts/start-apache.sh"]
-
-    adminpanel-2:
-        image: phober-php
-        container_name: adminpanel-2
-        environment:
-            << : *common-env
-            AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
-            AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
-            AWS_DEFAULT_REGION: us-east-1
-            AWS_BUCKET: media
-            AWS_URL: "${API_GATEWAY_HOST:-https://localhost}:${API_GATEWAY_PORT:-8000}/s3"
-            AWS_ENDPOINT: 'http://minio:9000'
-            AWS_USE_PATH_STYLE_ENDPOINT: 'true'
-        ports:
-            - "8200:80"
-        volumes:
-            - *shared-laravel-volume
-            - *shared-laravel-volume-2
-            - *scripts-volume
-            - ./adminpanel-2:/var/www/html
+            - ./services/adminpanel:/var/www/html
         depends_on:
             - db_mysql
         networks:
@@ -159,7 +130,7 @@ services:
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
-            - ./config-server:/var/www/html
+            - ./services/config-server:/var/www/html
         depends_on:
             - db_mysql
         networks:
@@ -183,7 +154,7 @@ services:
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
-            - ./device-service:/var/www/html
+            - ./services/device-service:/var/www/html
         depends_on:
             - db_postgres
         networks:
@@ -201,7 +172,7 @@ services:
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
-            - ./crm-service:/var/www/html
+            - ./services/crm-service:/var/www/html
         depends_on:
             - db_oracle
         networks:
@@ -217,7 +188,7 @@ services:
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
-            - ./staff-service:/var/www/html
+            - ./services/staff-service:/var/www/html
         depends_on:
             - db_mssql
         networks:
@@ -233,7 +204,7 @@ services:
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
-            - ./notification-server:/var/www/html
+            - ./services/notification-server:/var/www/html
         depends_on:
             - db_mysql
         networks:
@@ -249,7 +220,7 @@ services:
             << : *common-env
         volumes:
             - *shared-laravel-volume
-            - ./notification-server:/var/www/html
+            - ./services/notification-server:/var/www/html
         depends_on:
             - notification-server
         networks:
@@ -263,7 +234,7 @@ services:
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
-            - ./auth-server:/var/www/html
+            - ./services/auth-server:/var/www/html
         depends_on:
             - db_mssql
             - db_mysql
