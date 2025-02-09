@@ -1,2 +1,1 @@
-CREATE DATABASE IF NOT EXISTS phober_adminpanel;
 CREATE DATABASE IF NOT EXISTS phober_shared;

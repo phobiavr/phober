@@ -109,12 +109,14 @@ services:
             AWS_URL: "${API_GATEWAY_HOST:-https://localhost}:${API_GATEWAY_PORT:-8000}/s3"
             AWS_ENDPOINT: 'http://minio:9000'
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
+            DB_CONFIGS_DATABASE: '/var/www/html/database/configs.sqlite'
         ports:
             - "${ADMIN_PANEL_PORT:-8100}:80"
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
             - ./services/adminpanel:/var/www/html
+            - ./env/sqlite/configs.sqlite:/var/www/html/database/configs.sqlite
         depends_on:
             - db_mysql
         networks:
@@ -131,11 +133,12 @@ services:
             - *shared-laravel-volume
             - *scripts-volume
             - ./services/config-server:/var/www/html
+            - ./env/sqlite/configs.sqlite:/var/www/html/database/database.sqlite
         depends_on:
             - db_mysql
         networks:
             - private
-        entrypoint: ["/scripts/start-laravel-service.sh", "config-server"]
+        entrypoint: ["/scripts/start-apache.sh"]
         healthcheck: *common-healthcheck-v2
 
     device-service:
@@ -161,7 +164,7 @@ services:
             - private
         deploy:
             replicas: 1
-        entrypoint: ["/scripts/start-laravel-service.sh", "device-service"]
+        entrypoint: ["/scripts/start-apache.sh"]
         healthcheck: *common-healthcheck-v2
 
     crm-service:
@@ -177,7 +180,7 @@ services:
             - db_oracle
         networks:
             - private
-        entrypoint: ["/scripts/start-laravel-service.sh", "crm-service"]
+        entrypoint: ["/scripts/start-apache.sh"]
         healthcheck: *common-healthcheck-v2
 
     staff-service:
@@ -193,7 +196,7 @@ services:
             - db_mssql
         networks:
             - private
-        entrypoint: ["/scripts/start-laravel-service.sh", "staff-service"]
+        entrypoint: ["/scripts/start-apache.sh"]
         healthcheck: *common-healthcheck-v2
 
     notification-server:
@@ -209,7 +212,7 @@ services:
             - db_mysql
         networks:
             - private
-        entrypoint: ["/scripts/start-laravel-service.sh", "notification-server"]
+        entrypoint: ["/scripts/start-apache.sh"]
         healthcheck: *common-healthcheck-v2
 
     notification-queue:
@@ -240,7 +243,7 @@ services:
             - db_mysql
         networks:
             - private
-        entrypoint: ["/scripts/start-laravel-service.sh", "auth-server"]
+        entrypoint: ["/scripts/start-apache.sh"]
         healthcheck: *common-healthcheck-v2
 
     api-gateway:
