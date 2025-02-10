@@ -20,15 +20,6 @@ CREATE SEQUENCE CUSTOMERS_ID_SEQ
     INCREMENT BY 1
     NOCACHE;
 
-create trigger CUSTOMERS_ID_TRG
-    before insert
-    on CUSTOMERS
-    for each row
-begin
-    if :new.ID is null then
-        select customers_id_seq.nextval into :new.ID from dual;
-    end if;
-end;
 
 CREATE TABLE CONTACTS
 (
@@ -44,16 +35,6 @@ CREATE TABLE CONTACTS
     CREATED_AT  TIMESTAMP(6),
     UPDATED_AT  TIMESTAMP(6)
 );
-
-create trigger CONTACTS_ID_TRG
-    before insert
-    on CONTACTS
-    for each row
-begin
-    if :new.ID is null then
-        select contacts_id_seq.nextval into :new.ID from dual;
-    end if;
-end;
 
 CREATE SEQUENCE CONTACTS_ID_SEQ
     START WITH 1

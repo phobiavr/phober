@@ -95,10 +95,7 @@ services:
             - private
 
     adminpanel:
-        image: phober-php
-        build:
-            context: ./
-            dockerfile: ./docker/phober-php/Dockerfile
+        image: abdukhaligov/phober-php-apache
         container_name: adminpanel
         environment:
             << : *common-env
@@ -125,7 +122,7 @@ services:
         entrypoint: ["/scripts/start-apache.sh"]
 
     config-server:
-        image: phober-php
+        image: abdukhaligov/phober-php-apache
         container_name: config-server
         environment:
             << : *common-env
@@ -142,7 +139,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     device-service:
-        image: phober-php
+        image: abdukhaligov/phober-php-apache
         container_name: device-service
         environment:
             << : *common-env
@@ -168,7 +165,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     crm-service:
-        image: phober-php
+        image: abdukhaligov/phober-php-apache
         container_name: crm-service
         environment:
             << : *common-env
@@ -184,7 +181,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     staff-service:
-        image: phober-php
+        image: abdukhaligov/phober-php-apache
         container_name: staff-service
         environment:
             << : *common-env
@@ -200,7 +197,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     notification-server:
-        image: phober-php
+        image: abdukhaligov/phober-php-apache
         container_name: notification-server
         environment:
             << : *common-env
@@ -216,7 +213,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     notification-queue:
-        image: phober-php
+        image: abdukhaligov/phober-php-apache
         container_name: notification-queue
         command: php artisan queue:work
         environment:
@@ -230,7 +227,7 @@ services:
             - private
 
     auth-server:
-        image: phober-php
+        image: abdukhaligov/phober-php-apache
         container_name: auth-server
         environment:
             << : *common-env
