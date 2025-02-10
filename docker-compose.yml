@@ -21,7 +21,7 @@ x-shared-laravel-volume: &shared-laravel-volume
     ./shared/laravel-common:/var/www/html/shared:ro
 
 x-scripts-volume: &scripts-volume
-    ./env/scripts:/scripts:ro
+    ./docker/scripts:/scripts:ro
 
 services:
     db_mysql:
@@ -34,7 +34,7 @@ services:
         ports:
             - "${MYSQL_PUBLIC_PORT:-8306}:3306"
         volumes:
-            - ./env/mysql/init-db.sql:/var/opt/mysql/init-db.sql
+            - ./docker/mysql/init-db.sql:/var/opt/mysql/init-db.sql
             - db_mysql_data:/var/lib/mysql
         networks:
             - private
@@ -49,7 +49,7 @@ services:
         ports:
             - "${POSTGRES_PUBLIC_PORT:-8432}:5432"
         volumes:
-            - ./env/postgres:/docker-entrypoint-initdb.d
+            - ./docker/postgres:/docker-entrypoint-initdb.d
             - db_postgres_data:/var/lib/postgresql/data
         networks:
             - private
@@ -63,7 +63,7 @@ services:
         ports:
             - "${MSSQL_PUBLIC_PORT:-8433}:1433"
         volumes:
-            - ./env/sqlsrv/init-db.sql:/var/opt/mssql/init-db.sql
+            - ./docker/sqlsrv/init-db.sql:/var/opt/mssql/init-db.sql
             - db_mssql_data:/var/opt/mssql
         networks:
             - private
@@ -98,7 +98,7 @@ services:
         image: phober-php
         build:
             context: ./
-            dockerfile: ./env/phober-php/Dockerfile
+            dockerfile: ./docker/phober-php/Dockerfile
         container_name: adminpanel
         environment:
             << : *common-env
@@ -116,7 +116,7 @@ services:
             - *shared-laravel-volume
             - *scripts-volume
             - ./services/adminpanel:/var/www/html
-            - ./env/sqlite/configs.sqlite:/var/www/html/database/configs.sqlite
+            - ./docker/sqlite/configs.sqlite:/var/www/html/database/configs.sqlite
         depends_on:
             - db_mysql
         networks:
@@ -133,7 +133,7 @@ services:
             - *shared-laravel-volume
             - *scripts-volume
             - ./services/config-server:/var/www/html
-            - ./env/sqlite/configs.sqlite:/var/www/html/database/database.sqlite
+            - ./docker/sqlite/configs.sqlite:/var/www/html/database/database.sqlite
         depends_on:
             - db_mysql
         networks:
@@ -252,10 +252,10 @@ services:
         ports:
             - "${API_GATEWAY_PORT:-8000}:443"
         volumes:
-            - ./env/api-gateway/certs/nginx.crt:/etc/nginx/ssl/nginx.crt:ro
-            - ./env/api-gateway/certs/nginx.key:/etc/nginx/ssl/nginx.key:ro
-            - ./env/api-gateway/certs/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
-            - ./env/api-gateway/nginx.conf:/etc/nginx/nginx.conf
+            - ./docker/api-gateway/certs/nginx.crt:/etc/nginx/ssl/nginx.crt:ro
+            - ./docker/api-gateway/certs/nginx.key:/etc/nginx/ssl/nginx.key:ro
+            - ./docker/api-gateway/certs/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
+            - ./docker/api-gateway/nginx.conf:/etc/nginx/nginx.conf
         networks:
             - private
             - public
@@ -283,7 +283,7 @@ services:
         networks:
             - private
         volumes:
-            - ./env/elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+            - ./docker/elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
 
     kibana:
         image: kibana:7.17.1
