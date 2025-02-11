@@ -19,8 +19,6 @@ x-common-healthcheck-v2: &common-healthcheck-v2
 x-shared-laravel-volume: &shared-laravel-volume
     ./shared/laravel-common:/var/www/html/shared:ro
 
-x-scripts-volume: &scripts-volume
-    ./docker/scripts:/scripts:ro
 
 services:
     db_mysql:
@@ -111,7 +109,6 @@ services:
             - "${ADMIN_PANEL_PORT:-8100}:80"
         volumes:
             - *shared-laravel-volume
-            - *scripts-volume
             - ./services/adminpanel:/var/www/html
             - ./docker/sqlite/configs.sqlite:/var/www/html/database/configs.sqlite
         depends_on:
@@ -119,7 +116,7 @@ services:
         networks:
             - private
             - public
-        entrypoint: ["/scripts/start-apache.sh"]
+        entrypoint: sh -c "apache2 -D FOREGROUND"
 
     config-server:
         image: abdukhaligov/phober-php-apache
@@ -129,14 +126,13 @@ services:
             APP_KEY: ${APP_KEY_CONFIG_SERVER}
         volumes:
             - *shared-laravel-volume
-            - *scripts-volume
             - ./services/config-server:/var/www/html
             - ./docker/sqlite/configs.sqlite:/var/www/html/database/database.sqlite
         depends_on:
             - db_mysql
         networks:
             - private
-        entrypoint: ["/scripts/start-apache.sh"]
+        entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
 
     device-service:
@@ -155,7 +151,6 @@ services:
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
         volumes:
             - *shared-laravel-volume
-            - *scripts-volume
             - ./services/device-service:/var/www/html
         depends_on:
             - db_postgres
@@ -163,7 +158,7 @@ services:
             - private
         deploy:
             replicas: 1
-        entrypoint: ["/scripts/start-apache.sh"]
+        entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
 
     crm-service:
@@ -174,13 +169,12 @@ services:
             APP_KEY: ${APP_KEY_CRM_SERVICE}
         volumes:
             - *shared-laravel-volume
-            - *scripts-volume
             - ./services/crm-service:/var/www/html
         depends_on:
             - db_oracle
         networks:
             - private
-        entrypoint: ["/scripts/start-apache.sh"]
+        entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
 
     staff-service:
@@ -191,13 +185,12 @@ services:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
         volumes:
             - *shared-laravel-volume
-            - *scripts-volume
             - ./services/staff-service:/var/www/html
         depends_on:
             - db_mssql
         networks:
             - private
-        entrypoint: ["/scripts/start-apache.sh"]
+        entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
 
     notification-server:
@@ -208,13 +201,12 @@ services:
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
         volumes:
             - *shared-laravel-volume
-            - *scripts-volume
             - ./services/notification-server:/var/www/html
         depends_on:
             - db_mysql
         networks:
             - private
-        entrypoint: ["/scripts/start-apache.sh"]
+        entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
 
     notification-queue:
@@ -240,14 +232,13 @@ services:
             APP_KEY: ${APP_KEY_AUTH_SERVER}
         volumes:
             - *shared-laravel-volume
-            - *scripts-volume
             - ./services/auth-server:/var/www/html
         depends_on:
             - db_mssql
             - db_mysql
         networks:
             - private
-        entrypoint: ["/scripts/start-apache.sh"]
+        entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
 
     api-gateway:
