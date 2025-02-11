@@ -34,7 +34,7 @@ The `Api-Gateway` simplifies client-side interactions by providing a single entr
 
 **Note:** Refer to the provided Nginx configuration file (`env/api-gateway/nginx.conf`) for detailed setup and routing rules.
 
-### <p align="center">Media</p>
+### <p align="center">Media (buckets / !!update needed)</p>
 
 The `Media` folder within our repository serves as a centralized repository for storing and managing files, similar to an S3 bucket but located locally. It plays a crucial role in our application for organizing and accessing media files efficiently.
 
@@ -46,7 +46,7 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
 - **Device-service:** Accesses the `Media` folder in a read-only mode. This service retrieves and displays media files managed by the `Adminpanel` without modifying them.
 
-## Installation
+## Installation (!!update needed)
 
 ### Prerequisites
 
