@@ -7,7 +7,6 @@ x-common-env: &common-env
     APACHE_RUN_DIR: /var/run/apache2
     APACHE_PID_FILE: /var/run/apache2/apache2.pid
     APACHE_LOCK_DIR: /var/lock/apache2
-    APP_KEY: ${APP_KEY}
     APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
 
 x-common-healthcheck-v2: &common-healthcheck-v2
@@ -99,6 +98,7 @@ services:
         container_name: adminpanel
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_ADMINPANEL}
             AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
             AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
             AWS_DEFAULT_REGION: us-east-1
@@ -126,6 +126,7 @@ services:
         container_name: config-server
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_CONFIG_SERVER}
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
@@ -143,6 +144,7 @@ services:
         container_name: device-service
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             APP_URL: "/hardware"
             AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
             AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
@@ -169,6 +171,7 @@ services:
         container_name: crm-service
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_CRM_SERVICE}
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
@@ -185,6 +188,7 @@ services:
         container_name: staff-service
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_STAFF_SERVICE}
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
@@ -201,6 +205,7 @@ services:
         container_name: notification-server
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
@@ -218,6 +223,7 @@ services:
         command: php artisan queue:work
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
         volumes:
             - *shared-laravel-volume
             - ./services/notification-server:/var/www/html
@@ -231,6 +237,7 @@ services:
         container_name: auth-server
         environment:
             << : *common-env
+            APP_KEY: ${APP_KEY_AUTH_SERVER}
         volumes:
             - *shared-laravel-volume
             - *scripts-volume
