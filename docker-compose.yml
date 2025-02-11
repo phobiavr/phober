@@ -264,7 +264,7 @@ services:
             - staff-service
 
     elasticsearch:
-        image: elasticsearch:7.17.1
+        image: elasticsearch:7.17.26
         container_name: elasticsearch
         environment:
             - discovery.type=single-node
