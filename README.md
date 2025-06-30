@@ -68,7 +68,7 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
 
 3. Ensure you have the `auth.json` file configured in your `adminpanel` directory:
     ```bash
-    cp adminpanel/auth.json.example adminpanel/auth.json
+    cp services/adminpanel/auth.json.example services/adminpanel/auth.json
     ```
 
     ```json

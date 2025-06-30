@@ -69,6 +69,8 @@ create table phober_auth.dbo.users
     username          nvarchar(255) not null,
     first_name        nvarchar(255),
     last_name         nvarchar(255),
+    telegram          nvarchar(255),
+    telegram_chat_id  nvarchar(255),
     api_token         nvarchar(255),
     email             nvarchar(255),
     email_verified_at datetime,

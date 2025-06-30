@@ -53,6 +53,7 @@ services:
 
     db_mssql:
         image: mcr.microsoft.com/mssql/server:2022-latest
+        platform: linux/amd64
         container_name: db_mssql
         environment:
             ACCEPT_EULA: Y
@@ -60,7 +61,7 @@ services:
         ports:
             - "${MSSQL_PUBLIC_PORT:-8433}:1433"
         volumes:
-            - ./docker/sqlsrv/init-db.sql:/var/opt/mssql/init-db.sql
+            - ./docker/sqlsrv:/var/opt/mssql
             - db_mssql_data:/var/opt/mssql
         networks:
             - private
@@ -246,11 +247,13 @@ services:
         container_name: api-gateway
         ports:
             - "${API_GATEWAY_PORT:-8000}:443"
+            - "80:80"
         volumes:
             - ./docker/api-gateway/certs/nginx.crt:/etc/nginx/ssl/nginx.crt:ro
             - ./docker/api-gateway/certs/nginx.key:/etc/nginx/ssl/nginx.key:ro
             - ./docker/api-gateway/certs/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
             - ./docker/api-gateway/nginx.conf:/etc/nginx/nginx.conf
+            - ./docker/api-gateway/public:/etc/nginx/public:ro
         networks:
             - private
             - public
