@@ -142,21 +142,21 @@ create table phober_staff.dbo.reservations
     updated_at    datetime
 );
 
-create table phober_staff.dbo.sessions
+create table phober_staff.dbo.game_sessions
 (
     id          bigint identity
         primary key,
     instance_id bigint,
     schedule_id bigint,
     serviced_by bigint
-        constraint sessions_serviced_by_foreign
+        constraint game_sessions_serviced_by_foreign
             references employees,
     time        int,
     price       float,
     status      nvarchar(255) default 'QUEUE' not null,
     discount    float         default '0'     not null,
     invoice_id  bigint
-        constraint sessions_invoice_id_foreign
+        constraint game_sessions_invoice_id_foreign
             references invoices,
     note        nvarchar(max),
     created_at  datetime,
