@@ -7,19 +7,31 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Function to show a spinner/loader while background processes run
+# Ensure dialog is available (macOS does not ship whiptail)
+if ! command -v dialog &> /dev/null; then
+    if command -v brew &> /dev/null; then
+        echo -e "${YELLOW}Installing dialog via Homebrew...${NC}"
+        brew install dialog
+    else
+        echo -e "${RED}dialog not found and Homebrew is not installed.${NC}"
+        echo -e "Install Homebrew from https://brew.sh, then run: brew install dialog"
+        exit 1
+    fi
+fi
+
+# macOS-compatible spinner: /proc does not exist on macOS
 show_spinner() {
     local pid=$1
     local delay=0.1
     local spinner='|/-\'
 
-    while [ -d /proc/$pid ]; do
+    while kill -0 "$pid" 2>/dev/null; do
         for i in $(seq 0 3); do
             printf "\r%s " "${spinner:$i:1}"
             sleep $delay
         done
     done
-    printf "\r" # Clear the line after spinner completes
+    printf "\r"
 }
 
 # Function to run migration or seeding commands for services
@@ -88,17 +100,8 @@ initialize_databases() {
     echo -e "${CYAN}----------------------------------------${NC}"
 }
 
-# List of available tasks
-options=("Database Initialization (MySQL & SQL Server)" "on"
-         "Initialize Applications and Copy .env" "on"
-         "Run Config Updates" "on"
-         "Run Storage Link" "on"
-         "Run Migrations" "on"
-         "Run Hostname updates" "on"
-         "Run Seeders" "on")
-
-# Show a checkbox menu to select tasks
-selected=$(whiptail --title "Select Tasks to Run" --checklist \
+# Show a checkbox menu to select tasks (dialog instead of whiptail)
+selected=$(dialog --title "Select Tasks to Run" --checklist \
 "Choose the tasks you want to execute:" 20 78 10 \
 "1" "Database Initialization (MySQL & SQL Server)" ON \
 "2" "Initialize Applications and Copy .env" ON \
@@ -108,15 +111,27 @@ selected=$(whiptail --title "Select Tasks to Run" --checklist \
 "6" "Run Hostname updates" ON \
 "7" "Run Seeders" OFF 3>&1 1>&2 2>&3)
 
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+    echo -e "${RED}Cancelled.${NC}"
+    exit 0
+fi
+
+if [ -z "$selected" ]; then
+    echo -e "${YELLOW}No tasks selected. Exiting.${NC}"
+    exit 0
+fi
+
+# Strip quotes from dialog output (dialog outputs: 1 2 3, whiptail outputs: "1" "2" "3")
+selected=$(echo "$selected" | tr -d '"')
+
 # Check which steps were selected by the user
 for task in $selected; do
     case $task in
-        "\"1\"")
-            # Combined MySQL and SQL Server Initialization
+        "1")
             initialize_databases
             ;;
-        "\"2\"")
-            # Initialize Applications and Copy .env
+        "2")
             echo -e "${CYAN}Initializing applications and copying .env files...${NC}"
             applications=(
                 "adminpanel"
@@ -155,8 +170,7 @@ for task in $selected; do
                 echo -e "${CYAN}----------------------------------------${NC}"
             done
             ;;
-        "\"3\"")
-            # Config Client Update
+        "3")
             config_clients=(
                 "notification-server"
                 "auth-server"
@@ -168,8 +182,7 @@ for task in $selected; do
                 run_command $service "config-client:update" "config update"
             done
             ;;
-        "\"4\"")
-            # Storage Link
+        "4")
             storage_services=(
                 "adminpanel"
                 "device-service"
@@ -178,8 +191,7 @@ for task in $selected; do
                 run_command $service "storage:link" "storage link creation"
             done
             ;;
-        "\"5\"")
-            # Migrations
+        "5")
             migration_services=(
                 "adminpanel"
                 "auth-server"
@@ -189,8 +201,7 @@ for task in $selected; do
                 run_command $service "migrate" "migration"
             done
             ;;
-        "\"6\"")
-            # Services which need to insert hostnames
+        "6")
             hostname_services=(
                 "auth-server"
                 "notification-server"
@@ -203,12 +214,10 @@ for task in $selected; do
                 run_command $service "hostname:update $service" "hostname update"
             done
             ;;
-        "\"7\"")
-            # Seeders
+        "7")
             run_command "adminpanel" "db:seed" "seeding"
             ;;
     esac
 done
 
-# Finished
 echo -e "${GREEN}All selected operations completed.${NC}"
