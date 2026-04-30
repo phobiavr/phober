@@ -93,7 +93,7 @@ services:
             - private
 
     adminpanel:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: adminpanel
         environment:
             << : *common-env
@@ -120,7 +120,7 @@ services:
         entrypoint: sh -c "apache2 -D FOREGROUND"
 
     config-server:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: config-server
         environment:
             << : *common-env
@@ -137,7 +137,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     device-service:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: device-service
         environment:
             << : *common-env
@@ -163,7 +163,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     crm-service:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: crm-service
         environment:
             << : *common-env
@@ -179,7 +179,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     staff-service:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: staff-service
         environment:
             << : *common-env
@@ -195,7 +195,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     notification-server:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: notification-server
         environment:
             << : *common-env
@@ -211,7 +211,7 @@ services:
         healthcheck: *common-healthcheck-v2
 
     notification-queue:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: notification-queue
         command: php artisan queue:work
         environment:
@@ -226,7 +226,7 @@ services:
             - private
 
     auth-server:
-        image: abdukhaligov/phober-php-apache
+        image: abdukhaligov/phober-php-apache:1.0.0
         container_name: auth-server
         environment:
             << : *common-env
