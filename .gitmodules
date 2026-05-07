@@ -34,3 +34,6 @@
 [submodule "services/staff-app"]
 	path = services/staff-app
 	url = https://github.com/phobiavr/phober-staff-app.git
+[submodule "services/website"]
+	path = services/website
+	url = https://github.com/phobiavr/website.git
