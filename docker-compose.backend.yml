@@ -1,4 +1,4 @@
-version: "3.7"
+name: phober-backend
 
 x-common-env: &common-env
     APACHE_RUN_USER: "#1000"
@@ -8,6 +8,12 @@ x-common-env: &common-env
     APACHE_PID_FILE: /var/run/apache2/apache2.pid
     APACHE_LOCK_DIR: /var/lock/apache2
     APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
+    REDIS_CLIENT: predis
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+    CACHE_STORE: redis
+    SESSION_DRIVER: redis
+    QUEUE_CONNECTION: redis
 
 x-common-healthcheck-v2: &common-healthcheck-v2
     test: [ "CMD", "curl", "-f", "http://localhost/up" ]
@@ -21,77 +27,6 @@ x-shared-laravel-volume: &shared-laravel-volume
 
 
 services:
-    db_mysql:
-        image: mysql:8.0
-        container_name: db_mysql
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-            SERVICE_TAGS: dev
-            SERVICE_NAME: mysql
-        ports:
-            - "${MYSQL_PUBLIC_PORT:-8306}:3306"
-        volumes:
-            - ./docker/mysql/init-db.sql:/var/opt/mysql/init-db.sql
-            - db_mysql_data:/var/lib/mysql
-        networks:
-            - private
-
-    db_postgres:
-        image: postgres:13
-        container_name: db_postgres
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB:-database}
-            POSTGRES_USER: ${POSTGRES_USER:-user}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-        ports:
-            - "${POSTGRES_PUBLIC_PORT:-8432}:5432"
-        volumes:
-            - ./docker/postgres:/docker-entrypoint-initdb.d
-            - db_postgres_data:/var/lib/postgresql/data
-        networks:
-            - private
-
-    db_mssql:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-        platform: linux/amd64
-        container_name: db_mssql
-        environment:
-            ACCEPT_EULA: Y
-            MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Password1*}
-        ports:
-            - "${MSSQL_PUBLIC_PORT:-8433}:1433"
-        volumes:
-            - ./docker/sqlsrv:/var/opt/mssql
-            - db_mssql_data:/var/opt/mssql
-        networks:
-            - private
-
-    db_oracle:
-        image: gvenzl/oracle-free:latest
-        container_name: oracle
-        environment:
-            ORACLE_PASSWORD: ${ORACLE_PASSWORD:-Password1*}
-        ports:
-            - "${ORACLE_PUBLIC_PORT:-8521}:1521"
-        volumes:
-            - db_oracle_data:/opt/oracle/oradata
-        networks:
-            - private
-
-    minio:
-        image: minio/minio
-        container_name: minio
-        environment:
-            MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
-            MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
-        ports:
-            - "${MINIO_WEB_UI_PORT:-9100}:9001"
-        command: server /data --console-address ":9001"
-        volumes:
-            - ./buckets:/data
-        networks:
-            - private
-
     adminpanel:
         image: abdukhaligov/phober-php-apache:1.0.0
         container_name: adminpanel
@@ -112,8 +47,6 @@ services:
             - *shared-laravel-volume
             - ./services/adminpanel:/var/www/html
             - ./docker/sqlite/configs.sqlite:/var/www/html/database/configs.sqlite
-        depends_on:
-            - db_mysql
         networks:
             - private
             - public
@@ -129,8 +62,6 @@ services:
             - *shared-laravel-volume
             - ./services/config-server:/var/www/html
             - ./docker/sqlite/configs.sqlite:/var/www/html/database/database.sqlite
-        depends_on:
-            - db_mysql
         networks:
             - private
         entrypoint: sh -c "apache2 -D FOREGROUND"
@@ -150,11 +81,17 @@ services:
             AWS_URL: '/s3/media'
             AWS_ENDPOINT: 'http://minio:9000'
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
+            BROADCAST_CONNECTION: reverb
+            REVERB_APP_ID: ${REVERB_SCHEDULE_APP_ID:-schedule}
+            REVERB_APP_KEY: ${REVERB_SCHEDULE_APP_KEY:-schedule-key}
+            REVERB_APP_SECRET: ${REVERB_SCHEDULE_APP_SECRET:-schedule-secret}
+            REVERB_HOST: ws-schedule
+            REVERB_PORT: 8080
+            REVERB_SCHEME: http
+            QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
             - ./services/device-service:/var/www/html
-        depends_on:
-            - db_postgres
         networks:
             - private
         deploy:
@@ -171,8 +108,6 @@ services:
         volumes:
             - *shared-laravel-volume
             - ./services/crm-service:/var/www/html
-        depends_on:
-            - db_oracle
         networks:
             - private
         entrypoint: sh -c "apache2 -D FOREGROUND"
@@ -184,11 +119,17 @@ services:
         environment:
             << : *common-env
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
+            BROADCAST_CONNECTION: reverb
+            REVERB_APP_ID: ${REVERB_SESSIONS_APP_ID:-sessions}
+            REVERB_APP_KEY: ${REVERB_SESSIONS_APP_KEY:-sessions-key}
+            REVERB_APP_SECRET: ${REVERB_SESSIONS_APP_SECRET:-sessions-secret}
+            REVERB_HOST: ws-sessions
+            REVERB_PORT: 8080
+            REVERB_SCHEME: http
+            QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
-        depends_on:
-            - db_mssql
         networks:
             - private
         entrypoint: sh -c "apache2 -D FOREGROUND"
@@ -203,27 +144,10 @@ services:
         volumes:
             - *shared-laravel-volume
             - ./services/notification-server:/var/www/html
-        depends_on:
-            - db_mysql
         networks:
             - private
         entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
-
-    notification-queue:
-        image: abdukhaligov/phober-php-apache:1.0.0
-        container_name: notification-queue
-        command: php artisan queue:work
-        environment:
-            << : *common-env
-            APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
-        volumes:
-            - *shared-laravel-volume
-            - ./services/notification-server:/var/www/html
-        depends_on:
-            - notification-server
-        networks:
-            - private
 
     auth-server:
         image: abdukhaligov/phober-php-apache:1.0.0
@@ -234,28 +158,10 @@ services:
         volumes:
             - *shared-laravel-volume
             - ./services/auth-server:/var/www/html
-        depends_on:
-            - db_mssql
-            - db_mysql
         networks:
             - private
         entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
-
-    staff-app:
-        image: node:20-alpine
-        container_name: staff-app
-        working_dir: /app
-        command: sh -c "npm install && npm run dev"
-        ports:
-            - "${STAFF_APP_PORT:-3000}:5173"
-        volumes:
-            - ./services/staff-app:/app
-            - /app/node_modules
-        environment:
-            VITE_API_URL: ${STAFF_APP_API_URL:-https://localhost:8000}
-        networks:
-            - public
 
     api-gateway:
         image: nginx:latest
@@ -279,59 +185,10 @@ services:
             - crm-service
             - staff-service
 
-    elasticsearch:
-        image: elasticsearch:7.17.26
-        container_name: elasticsearch
-        environment:
-            - discovery.type=single-node
-            - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
-        volumes:
-            - elasticsearch_data:/usr/share/elasticsearch/data
-        networks:
-            - private
-
-    logstash:
-        image: logstash:7.17.1
-        container_name: logstash
-        networks:
-            - private
-        volumes:
-            - ./docker/elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-
-    kibana:
-        image: kibana:7.17.1
-        container_name: kibana
-        ports:
-            - "${KIBANA_PORT:-8601}:5601"
-        networks:
-            - private
-
-    website:
-        image: node:20-alpine
-        container_name: website
-        working_dir: /app
-        command: sh -c "npm install && npm run dev"
-        ports:
-            - "${WEBSITE_PORT:-3001}:5173"
-        volumes:
-            - ./services/website:/app
-            - /app/node_modules
-        environment:
-            VITE_API_URL: ${API_URL:-https://localhost:8000}
-        networks:
-            - public
-
-volumes:
-    db_mysql_data:
-    db_postgres_data:
-    db_oracle_data:
-    db_mssql_data:
-    elasticsearch_data:
-
 networks:
     private:
+        external: true
         name: phober_private
-        driver: bridge
     public:
+        external: true
         name: phober_public
-        driver: bridge

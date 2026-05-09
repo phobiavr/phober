@@ -1,0 +1,37 @@
+name: phober-elk
+
+services:
+    elasticsearch:
+        image: elasticsearch:7.17.26
+        container_name: elasticsearch
+        environment:
+            - discovery.type=single-node
+            - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+        volumes:
+            - elasticsearch_data:/usr/share/elasticsearch/data
+        networks:
+            - private
+
+    logstash:
+        image: logstash:7.17.1
+        container_name: logstash
+        networks:
+            - private
+        volumes:
+            - ./docker/elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+    kibana:
+        image: kibana:7.17.1
+        container_name: kibana
+        ports:
+            - "${KIBANA_PORT:-8601}:5601"
+        networks:
+            - private
+
+volumes:
+    elasticsearch_data:
+
+networks:
+    private:
+        external: true
+        name: phober_private
