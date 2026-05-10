@@ -13,8 +13,7 @@ services:
             - /app/node_modules
         environment:
             VITE_API_URL: ${STAFF_APP_API_URL:-https://localhost:8000}
-            VITE_REVERB_SESSIONS_KEY: ${REVERB_SESSIONS_APP_KEY:-sessions-key}
-            VITE_REVERB_SCHEDULE_KEY: ${REVERB_SCHEDULE_APP_KEY:-schedule-key}
+            VITE_REVERB_KEY: ${REVERB_APP_KEY:-phober-key}
         networks:
             - public
 
@@ -30,8 +29,6 @@ services:
             - /app/node_modules
         environment:
             VITE_API_URL: ${API_URL:-https://localhost:8000}
-            VITE_REVERB_SESSIONS_KEY: ${REVERB_SESSIONS_APP_KEY:-sessions-key}
-            VITE_REVERB_SCHEDULE_KEY: ${REVERB_SCHEDULE_APP_KEY:-schedule-key}
         networks:
             - public
 

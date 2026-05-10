@@ -15,6 +15,15 @@ x-common-env: &common-env
     SESSION_DRIVER: redis
     QUEUE_CONNECTION: redis
 
+x-reverb-env: &reverb-env
+    BROADCAST_CONNECTION: reverb
+    REVERB_APP_ID: ${REVERB_APP_ID:-phober}
+    REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
+    REVERB_APP_SECRET: ${REVERB_APP_SECRET:-phober-secret}
+    REVERB_HOST: ws
+    REVERB_PORT: 8080
+    REVERB_SCHEME: http
+
 x-shared-laravel-volume: &shared-laravel-volume
     ./shared/laravel-common:/var/www/html/shared:ro
 
@@ -37,15 +46,8 @@ services:
         container_name: staff-queue
         command: php artisan queue:work --queue=staff
         environment:
-            << : *common-env
+            <<: [*common-env, *reverb-env]
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SESSIONS_APP_ID:-sessions}
-            REVERB_APP_KEY: ${REVERB_SESSIONS_APP_KEY:-sessions-key}
-            REVERB_APP_SECRET: ${REVERB_SESSIONS_APP_SECRET:-sessions-secret}
-            REVERB_HOST: ws-sessions
-            REVERB_PORT: 8080
-            REVERB_SCHEME: http
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
@@ -58,15 +60,8 @@ services:
         container_name: device-queue
         command: php artisan queue:work --queue=device
         environment:
-            << : *common-env
+            <<: [*common-env, *reverb-env]
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SCHEDULE_APP_ID:-schedule}
-            REVERB_APP_KEY: ${REVERB_SCHEDULE_APP_KEY:-schedule-key}
-            REVERB_APP_SECRET: ${REVERB_SCHEDULE_APP_SECRET:-schedule-secret}
-            REVERB_HOST: ws-schedule
-            REVERB_PORT: 8080
-            REVERB_SCHEME: http
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
@@ -79,15 +74,8 @@ services:
         container_name: staff-schedule
         command: php artisan schedule:work
         environment:
-            << : *common-env
+            <<: [*common-env, *reverb-env]
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SESSIONS_APP_ID:-sessions}
-            REVERB_APP_KEY: ${REVERB_SESSIONS_APP_KEY:-sessions-key}
-            REVERB_APP_SECRET: ${REVERB_SESSIONS_APP_SECRET:-sessions-secret}
-            REVERB_HOST: ws-sessions
-            REVERB_PORT: 8080
-            REVERB_SCHEME: http
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
@@ -100,15 +88,8 @@ services:
         container_name: device-schedule
         command: php artisan schedule:work
         environment:
-            << : *common-env
+            <<: [*common-env, *reverb-env]
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SCHEDULE_APP_ID:-schedule}
-            REVERB_APP_KEY: ${REVERB_SCHEDULE_APP_KEY:-schedule-key}
-            REVERB_APP_SECRET: ${REVERB_SCHEDULE_APP_SECRET:-schedule-secret}
-            REVERB_HOST: ws-schedule
-            REVERB_PORT: 8080
-            REVERB_SCHEME: http
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
@@ -116,43 +97,23 @@ services:
         networks:
             - private
 
-    ws-sessions:
+    ws:
         image: abdukhaligov/phober-php-apache:1.0.0
-        container_name: ws-sessions
+        container_name: ws
         command: sh -c "php artisan reverb:start --host=0.0.0.0 --port=8080 --debug"
         environment:
             << : *common-env
-            APP_KEY: ${APP_KEY_STAFF_SERVICE}
+            APP_KEY: ${APP_KEY_AUTH_SERVER}
             BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SESSIONS_APP_ID:-sessions}
-            REVERB_APP_KEY: ${REVERB_SESSIONS_APP_KEY:-sessions-key}
-            REVERB_APP_SECRET: ${REVERB_SESSIONS_APP_SECRET:-sessions-secret}
+            REVERB_APP_ID: ${REVERB_APP_ID:-phober}
+            REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
+            REVERB_APP_SECRET: ${REVERB_APP_SECRET:-phober-secret}
             REVERB_HOST: 0.0.0.0
             REVERB_PORT: 8080
             REVERB_SCHEME: http
         volumes:
             - *shared-laravel-volume
-            - ./services/staff-service:/var/www/html
-        networks:
-            - private
-
-    ws-schedule:
-        image: abdukhaligov/phober-php-apache:1.0.0
-        container_name: ws-schedule
-        command: sh -c "php artisan reverb:start --host=0.0.0.0 --port=8080 --debug"
-        environment:
-            << : *common-env
-            APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SCHEDULE_APP_ID:-schedule}
-            REVERB_APP_KEY: ${REVERB_SCHEDULE_APP_KEY:-schedule-key}
-            REVERB_APP_SECRET: ${REVERB_SCHEDULE_APP_SECRET:-schedule-secret}
-            REVERB_HOST: 0.0.0.0
-            REVERB_PORT: 8080
-            REVERB_SCHEME: http
-        volumes:
-            - *shared-laravel-volume
-            - ./services/device-service:/var/www/html
+            - ./services/auth-server:/var/www/html
         networks:
             - private
 

@@ -15,6 +15,15 @@ x-common-env: &common-env
     SESSION_DRIVER: redis
     QUEUE_CONNECTION: redis
 
+x-reverb-env: &reverb-env
+    BROADCAST_CONNECTION: reverb
+    REVERB_APP_ID: ${REVERB_APP_ID:-phober}
+    REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
+    REVERB_APP_SECRET: ${REVERB_APP_SECRET:-phober-secret}
+    REVERB_HOST: ws
+    REVERB_PORT: 8080
+    REVERB_SCHEME: http
+
 x-common-healthcheck-v2: &common-healthcheck-v2
     test: [ "CMD", "curl", "-f", "http://localhost/up" ]
     interval: 10m
@@ -31,7 +40,7 @@ services:
         image: abdukhaligov/phober-php-apache:1.0.0
         container_name: adminpanel
         environment:
-            << : *common-env
+            <<: [*common-env, *reverb-env]
             APP_KEY: ${APP_KEY_ADMINPANEL}
             AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
             AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
@@ -71,7 +80,7 @@ services:
         image: abdukhaligov/phober-php-apache:1.0.0
         container_name: device-service
         environment:
-            << : *common-env
+            <<: [*common-env, *reverb-env]
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             APP_URL: "/hardware"
             AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
@@ -81,13 +90,6 @@ services:
             AWS_URL: '/s3/media'
             AWS_ENDPOINT: 'http://minio:9000'
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
-            BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SCHEDULE_APP_ID:-schedule}
-            REVERB_APP_KEY: ${REVERB_SCHEDULE_APP_KEY:-schedule-key}
-            REVERB_APP_SECRET: ${REVERB_SCHEDULE_APP_SECRET:-schedule-secret}
-            REVERB_HOST: ws-schedule
-            REVERB_PORT: 8080
-            REVERB_SCHEME: http
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
@@ -117,15 +119,8 @@ services:
         image: abdukhaligov/phober-php-apache:1.0.0
         container_name: staff-service
         environment:
-            << : *common-env
+            <<: [*common-env, *reverb-env]
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            BROADCAST_CONNECTION: reverb
-            REVERB_APP_ID: ${REVERB_SESSIONS_APP_ID:-sessions}
-            REVERB_APP_KEY: ${REVERB_SESSIONS_APP_KEY:-sessions-key}
-            REVERB_APP_SECRET: ${REVERB_SESSIONS_APP_SECRET:-sessions-secret}
-            REVERB_HOST: ws-sessions
-            REVERB_PORT: 8080
-            REVERB_SCHEME: http
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
