@@ -36,6 +36,20 @@ x-shared-laravel-volume: &shared-laravel-volume
 
 
 services:
+    nginx-proxy-manager:
+      image: 'jc21/nginx-proxy-manager:latest'
+      container_name: nginx-proxy-manager
+      ports:
+        - '80:80'
+        - '81:81'
+        - '443:443'
+      volumes:
+        - ./docker/npm/data:/data
+        - ./docker/npm/letsencrypt:/etc/letsencrypt
+      networks:
+        - public
+        - private
+
     adminpanel:
         image: abdukhaligov/phober-php-apache:1.0.0
         container_name: adminpanel
@@ -50,8 +64,6 @@ services:
             AWS_ENDPOINT: 'http://minio:9000'
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
             DB_CONFIGS_DATABASE: '/var/www/html/database/configs.sqlite'
-        ports:
-            - "${ADMIN_PANEL_PORT:-8100}:80"
         volumes:
             - *shared-laravel-volume
             - ./services/adminpanel:/var/www/html
@@ -60,6 +72,39 @@ services:
             - private
             - public
         entrypoint: sh -c "apache2 -D FOREGROUND"
+
+    api-gateway:
+        image: nginx:latest
+        container_name: api-gateway
+        volumes:
+            - ./docker/api-gateway/certs/nginx.crt:/etc/nginx/ssl/nginx.crt:ro
+            - ./docker/api-gateway/certs/nginx.key:/etc/nginx/ssl/nginx.key:ro
+            - ./docker/api-gateway/certs/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
+            - ./docker/api-gateway/nginx.conf:/etc/nginx/nginx.conf
+            - ./docker/api-gateway/public:/etc/nginx/public:ro
+        networks:
+            - private
+            - public
+        depends_on:
+            - notification-server
+            - auth-server
+            - device-service
+            - crm-service
+            - staff-service
+
+    auth-server:
+        image: abdukhaligov/phober-php-apache:1.0.0
+        container_name: auth-server
+        environment:
+            << : *common-env
+            APP_KEY: ${APP_KEY_AUTH_SERVER}
+        volumes:
+            - *shared-laravel-volume
+            - ./services/auth-server:/var/www/html
+        networks:
+            - private
+        entrypoint: sh -c "apache2 -D FOREGROUND"
+        healthcheck: *common-healthcheck-v2
 
     config-server:
         image: abdukhaligov/phober-php-apache:1.0.0
@@ -71,6 +116,20 @@ services:
             - *shared-laravel-volume
             - ./services/config-server:/var/www/html
             - ./docker/sqlite/configs.sqlite:/var/www/html/database/database.sqlite
+        networks:
+            - private
+        entrypoint: sh -c "apache2 -D FOREGROUND"
+        healthcheck: *common-healthcheck-v2
+
+    notification-server:
+        image: abdukhaligov/phober-php-apache:1.0.0
+        container_name: notification-server
+        environment:
+            << : *common-env
+            APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
+        volumes:
+            - *shared-laravel-volume
+            - ./services/notification-server:/var/www/html
         networks:
             - private
         entrypoint: sh -c "apache2 -D FOREGROUND"
@@ -129,56 +188,6 @@ services:
             - private
         entrypoint: sh -c "apache2 -D FOREGROUND"
         healthcheck: *common-healthcheck-v2
-
-    notification-server:
-        image: abdukhaligov/phober-php-apache:1.0.0
-        container_name: notification-server
-        environment:
-            << : *common-env
-            APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
-        volumes:
-            - *shared-laravel-volume
-            - ./services/notification-server:/var/www/html
-        networks:
-            - private
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
-
-    auth-server:
-        image: abdukhaligov/phober-php-apache:1.0.0
-        container_name: auth-server
-        environment:
-            << : *common-env
-            APP_KEY: ${APP_KEY_AUTH_SERVER}
-        volumes:
-            - *shared-laravel-volume
-            - ./services/auth-server:/var/www/html
-        networks:
-            - private
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
-
-    api-gateway:
-        image: nginx:latest
-        container_name: api-gateway
-        ports:
-            - "${API_GATEWAY_PORT:-8000}:443"
-            - "80:80"
-        volumes:
-            - ./docker/api-gateway/certs/nginx.crt:/etc/nginx/ssl/nginx.crt:ro
-            - ./docker/api-gateway/certs/nginx.key:/etc/nginx/ssl/nginx.key:ro
-            - ./docker/api-gateway/certs/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
-            - ./docker/api-gateway/nginx.conf:/etc/nginx/nginx.conf
-            - ./docker/api-gateway/public:/etc/nginx/public:ro
-        networks:
-            - private
-            - public
-        depends_on:
-            - notification-server
-            - auth-server
-            - device-service
-            - crm-service
-            - staff-service
 
 networks:
     private:

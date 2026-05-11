@@ -2,3 +2,4 @@
 /buckets/.minio.sys/
 .env
 /buckets/media/
+/services/web-app-ref/
