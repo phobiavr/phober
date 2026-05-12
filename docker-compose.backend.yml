@@ -33,7 +33,7 @@ x-apache-env: &apache-env
     APACHE_LOCK_DIR: /var/lock/apache2
 
 x-laravel-env: &laravel-env
-    APP_NAME: "Phober 6"
+    APP_NAME: "Phober"
     APP_ENV: ${APP_ENV:-local}
     APP_DEBUG: ${APP_DEBUG:-true}
     APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}

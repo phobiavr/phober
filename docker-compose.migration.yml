@@ -7,7 +7,7 @@ name: phober-migration
 x-php-image: &php-image abdukhaligov/phober-php-apache:2.0.0
 
 x-laravel-env: &laravel-env
-    APP_NAME: "Phober 6"
+    APP_NAME: "Phober"
     APP_ENV: ${APP_ENV:-local}
     APP_DEBUG: ${APP_DEBUG:-true}
     APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
