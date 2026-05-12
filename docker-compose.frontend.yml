@@ -16,15 +16,11 @@ services:
             - public
 
     website:
-        image: node:20-alpine
+        image: nginx:alpine
         container_name: website
-        working_dir: /app
-        command: sh -c "npm install && npm run dev -- --host"
+        restart: unless-stopped
         volumes:
-            - ./services/website:/app
-            - /app/node_modules
-        environment:
-            VITE_API_URL: ${VITE_API_URL:-http://api.phober.test}
+            - ./services/website:/usr/share/nginx/html:ro
         networks:
             - public
 
