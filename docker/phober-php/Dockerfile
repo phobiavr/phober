@@ -1,92 +1,138 @@
-FROM php:8.2-apache
+# syntax=docker/dockerfile:1.7
+FROM php:8.2-apache-bookworm
 
-LABEL maintainer="Hikmat Abdukhaligov"
+LABEL maintainer="Hikmat Abdukhaligov" \
+      org.opencontainers.image.title="phober-php-apache" \
+      org.opencontainers.image.description="PHP 8.2 + Apache image for Phober services (MySQL only)" \
+      org.opencontainers.image.version="2.0.0"
 
-# Default user and group
+# Default non-root user
 ARG user=user
 ARG uid=1000
 ARG gid=1000
 
-# Oracle Instant Client Download links
-ENV INSTANTCLIENT "https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip"
-ENV INSTANTCLIENT_SDK "https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-sdk-linux.x64-21.12.0.0.0dbru.zip"
-ENV SQLPLUS "https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-sqlplus-linux.x64-21.12.0.0.0dbru.zip"
+# Pinned Composer version for reproducible builds
+ARG composer_version=2.7.7
 
-# Oracle Instant Client ENV Variables
-ENV LD_LIBRARY_PATH "/opt/oracle/instantclient"
-ENV PATH "$PATH:$LD_LIBRARY_PATH"
+# Build-time tuning
+ENV DEBIAN_FRONTEND=noninteractive \
+    COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_NO_INTERACTION=1 \
+    COMPOSER_HOME=/tmp/composer \
+    PHP_MEMORY_LIMIT=512M \
+    PHP_OPCACHE_MEMORY_CONSUMPTION=192 \
+    PHP_OPCACHE_MAX_ACCELERATED_FILES=20000 \
+    PHP_OPCACHE_VALIDATE_TIMESTAMPS=0
 
-# Install system dependencies and PHP extensions
-RUN apt-get update && apt-get install -y \
-    curl \
-    g++ \
-    git \
-    libbz2-dev \
-    libfreetype6-dev \
-    libicu-dev \
-    libjpeg-dev \
-    libmcrypt-dev \
-    libpng-dev \
-    libreadline-dev \
-    libonig-dev \
-    libxml2-dev \
-    libpq-dev \
-    libaio1 \
-    libzip-dev \
-    sudo \
-    unzip \
-    zip \
-    gnupg2 \
-    apt-transport-https \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && apt-get update && ACCEPT_EULA=Y apt-get install -y \
-        msodbcsql17 \
-        unixodbc-dev \
-        libgssapi-krb5-2 \
-    && pecl install sqlsrv pdo_sqlsrv \
-    && docker-php-ext-enable sqlsrv pdo_sqlsrv \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache sockets zip \
-    && curl -L $INSTANTCLIENT -o /tmp/instantclient-basic.zip \
-    && curl -L $INSTANTCLIENT_SDK -o /tmp/instantclient-sdk.zip \
-    && curl -L $SQLPLUS -o /tmp/instantclient-sqlplus.zip \
-    && mkdir -p /opt/oracle \
-    && unzip /tmp/instantclient-basic.zip -d /opt/oracle/ \
-    && unzip /tmp/instantclient-sdk.zip -d /opt/oracle/ \
-    && unzip /tmp/instantclient-sqlplus.zip -d /opt/oracle/ \
-    && rm /tmp/instantclient-*.zip \
-    && mv /opt/oracle/instantclient_* /opt/oracle/instantclient \
-    && echo /opt/oracle/instantclient > /etc/ld.so.conf.d/oracleinstantclient.conf \
-    && ldconfig \
-    && echo 'instantclient,/opt/oracle/instantclient' | pecl install oci8 \
-    && docker-php-ext-enable oci8 \
-    && rm -rf /var/lib/apt/lists/*
+# ---------------------------------------------------------------------------
+# System dependencies + PHP extensions
+# ---------------------------------------------------------------------------
+# Split into build-deps (purged after compile) and run-deps (kept) to shrink
+# the final image. BuildKit cache mounts speed up repeated builds.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -eux; \
+    savedAptMark="$(apt-mark showmanual)"; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        unzip \
+        zip \
+        libbz2-dev \
+        libfreetype6-dev \
+        libicu-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libonig-dev \
+        libxml2-dev \
+        libzip-dev; \
+    \
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-configure opcache --enable-opcache; \
+    docker-php-ext-install -j"$(nproc)" \
+        bcmath \
+        bz2 \
+        exif \
+        gd \
+        intl \
+        mbstring \
+        opcache \
+        pcntl \
+        pdo_mysql \
+        sockets \
+        zip; \
+    \
+    # Re-mark only what is actually needed at runtime, then purge build-deps.
+    apt-mark auto '.*' > /dev/null; \
+    [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
+    find /usr/local/lib/php/extensions -type f -name '*.so' -exec \
+        ldd '{}' ';' \
+        | awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
+        | sort -u \
+        | xargs -r dpkg-query --search 2>/dev/null \
+        | cut -d: -f1 \
+        | sort -u \
+        | xargs -r apt-mark manual; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+    rm -rf /var/lib/apt/lists/*
 
-# Configure Apache Document Root
+# ---------------------------------------------------------------------------
+# PHP runtime configuration
+# ---------------------------------------------------------------------------
+RUN set -eux; \
+    mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
+    { \
+        echo "memory_limit=\${PHP_MEMORY_LIMIT}"; \
+        echo "expose_php=Off"; \
+        echo "upload_max_filesize=64M"; \
+        echo "post_max_size=64M"; \
+        echo "date.timezone=UTC"; \
+    } > "$PHP_INI_DIR/conf.d/zz-phober.ini"; \
+    { \
+        echo "opcache.enable=1"; \
+        echo "opcache.enable_cli=1"; \
+        echo "opcache.memory_consumption=\${PHP_OPCACHE_MEMORY_CONSUMPTION}"; \
+        echo "opcache.interned_strings_buffer=16"; \
+        echo "opcache.max_accelerated_files=\${PHP_OPCACHE_MAX_ACCELERATED_FILES}"; \
+        echo "opcache.validate_timestamps=\${PHP_OPCACHE_VALIDATE_TIMESTAMPS}"; \
+        echo "opcache.revalidate_freq=2"; \
+        echo "opcache.jit_buffer_size=64M"; \
+        echo "opcache.jit=tracing"; \
+    } > "$PHP_INI_DIR/conf.d/zz-opcache.ini"
+
+# ---------------------------------------------------------------------------
+# Apache configuration
+# ---------------------------------------------------------------------------
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN set -eux; \
+    sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf; \
+    sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf; \
+    a2enmod rewrite headers expires deflate; \
+    { \
+        echo "ServerTokens Prod"; \
+        echo "ServerSignature Off"; \
+        echo "TraceEnable Off"; \
+    } > /etc/apache2/conf-available/security-hardening.conf; \
+    a2enconf security-hardening
 
-# Enable Apache mod_rewrite and mod_headers
-RUN a2enmod rewrite headers
+# ---------------------------------------------------------------------------
+# Composer
+# ---------------------------------------------------------------------------
+COPY --from=composer:2.7.7 /usr/bin/composer /usr/bin/composer
 
-# Use the default development configuration
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+# ---------------------------------------------------------------------------
+# Non-root user
+# ---------------------------------------------------------------------------
+RUN set -eux; \
+    groupadd -g ${gid} ${user}; \
+    useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user}; \
+    install -d -o ${user} -g ${user} /home/${user}/.composer /var/www/html
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Create a system group and user to run Composer and Artisan Commands
-RUN groupadd -g ${gid} ${user} \
-    && useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user} \
-    && mkdir -p /home/${user}/.composer \
-    && chown -R ${user}:${user} /home/${user}
-
-# Set working directory
 WORKDIR /var/www/html
 
-# Change ownership of the working directory to user
-RUN chown -R ${user}:${user} /var/www/html
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -fsS http://127.0.0.1/ >/dev/null || exit 1
 
-# Switch to the user
 USER ${user}

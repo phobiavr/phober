@@ -11,50 +11,8 @@ services:
         ports:
             - "${MYSQL_PUBLIC_PORT:-8306}:3306"
         volumes:
-            - ./docker/mysql/init-db.sql:/var/opt/mysql/init-db.sql
+            - ./docker/mysql/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
             - db_mysql_data:/var/lib/mysql
-        networks:
-            - private
-
-    db_postgres:
-        image: postgres:13
-        container_name: db_postgres
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB:-database}
-            POSTGRES_USER: ${POSTGRES_USER:-user}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-        ports:
-            - "${POSTGRES_PUBLIC_PORT:-8432}:5432"
-        volumes:
-            - ./docker/postgres:/docker-entrypoint-initdb.d
-            - db_postgres_data:/var/lib/postgresql/data
-        networks:
-            - private
-
-    db_mssql:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-        platform: linux/amd64
-        container_name: db_mssql
-        environment:
-            ACCEPT_EULA: Y
-            MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Password1*}
-        ports:
-            - "${MSSQL_PUBLIC_PORT:-8433}:1433"
-        volumes:
-            - ./docker/sqlsrv:/var/opt/mssql
-            - db_mssql_data:/var/opt/mssql
-        networks:
-            - private
-
-    db_oracle:
-        image: gvenzl/oracle-free:latest
-        container_name: oracle
-        environment:
-            ORACLE_PASSWORD: ${ORACLE_PASSWORD:-Password1*}
-        ports:
-            - "${ORACLE_PUBLIC_PORT:-8521}:1521"
-        volumes:
-            - db_oracle_data:/opt/oracle/oradata
         networks:
             - private
 
@@ -84,25 +42,14 @@ services:
 
 volumes:
     db_mysql_data:
-        external: true
         name: phober_db_mysql_data
-    db_postgres_data:
-        external: true
-        name: phober_db_postgres_data
-    db_oracle_data:
-        external: true
-        name: phober_db_oracle_data
-    db_mssql_data:
-        external: true
-        name: phober_db_mssql_data
     redis_data:
-        external: true
         name: phober_redis_data
 
 networks:
     private:
         name: phober_private
-        driver: bridge
+        external: true
     public:
         name: phober_public
-        driver: bridge
+        external: true

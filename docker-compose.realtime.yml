@@ -1,19 +1,59 @@
 name: phober-realtime
 
-x-common-env: &common-env
+# ──────────────────────────────────────────────────────────────────────────────
+# Reusable building blocks (kept in sync with docker-compose.backend.yml)
+# ──────────────────────────────────────────────────────────────────────────────
+
+x-php-image: &php-image abdukhaligov/phober-php-apache:2.0.0
+
+x-php-base: &php-base
+    image: *php-image
+    restart: unless-stopped
+    networks: [private]
+
+x-shared-laravel-volume: &shared-laravel-volume
+    ./shared/laravel-common:/var/www/html/shared:ro
+
+# ── env blocks ────────────────────────────────────────────────────────────────
+
+x-apache-env: &apache-env
     APACHE_RUN_USER: "#1000"
     APACHE_RUN_GROUP: "#1000"
     APACHE_LOG_DIR: /var/log/apache2
     APACHE_RUN_DIR: /var/run/apache2
     APACHE_PID_FILE: /var/run/apache2/apache2.pid
     APACHE_LOCK_DIR: /var/lock/apache2
+
+x-laravel-env: &laravel-env
+    APP_NAME: "Phober 6"
+    APP_ENV: ${APP_ENV:-local}
+    APP_DEBUG: ${APP_DEBUG:-true}
     APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
+    APP_LOCALE: en
+    APP_FALLBACK_LOCALE: en
+    APP_MAINTENANCE_DRIVER: file
+    BCRYPT_ROUNDS: "12"
+    LOG_CHANNEL: stack
+    LOG_LEVEL: ${LOG_LEVEL:-debug}
+    TELESCOPE_ENABLED: ${TELESCOPE_ENABLED:-true}
+    FILESYSTEM_DISK: local
+    QUEUE_CONNECTION: database
+    DB_QUEUE_CONNECTION: db_shared
+
+x-redis-env: &redis-env
     REDIS_CLIENT: predis
     REDIS_HOST: redis
-    REDIS_PORT: 6379
+    REDIS_PORT: "6379"
     CACHE_STORE: redis
     SESSION_DRIVER: redis
     QUEUE_CONNECTION: redis
+
+x-mail-env: &mail-env
+    MAIL_MAILER: ${MAIL_MAILER:-log}
+    MAIL_HOST: ${MAIL_HOST:-mailhog}
+    MAIL_PORT: ${MAIL_PORT:-1025}
+    MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-hello@phober.test}
+    MAIL_FROM_NAME: Phober
 
 x-reverb-env: &reverb-env
     BROADCAST_CONNECTION: reverb
@@ -21,101 +61,152 @@ x-reverb-env: &reverb-env
     REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
     REVERB_APP_SECRET: ${REVERB_APP_SECRET:-phober-secret}
     REVERB_HOST: ws
-    REVERB_PORT: 8080
+    REVERB_PORT: "8080"
     REVERB_SCHEME: http
 
-x-shared-laravel-volume: &shared-laravel-volume
-    ./shared/laravel-common:/var/www/html/shared:ro
+x-db-shared-env: &db-shared-env
+    DB_SHARED_CONNECTION: mysql
+    DB_SHARED_HOST: db_mysql
+    DB_SHARED_PORT: "3306"
+    DB_SHARED_DATABASE: phober_shared
+    DB_SHARED_USERNAME: root
+    DB_SHARED_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-device-default-env: &db-device-default-env
+    DB_CONNECTION: mysql
+    DB_HOST: db_mysql
+    DB_PORT: "3306"
+    DB_DATABASE: phober_device
+    DB_USERNAME: root
+    DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-staff-default-env: &db-staff-default-env
+    DB_CONNECTION: mysql
+    DB_HOST: db_mysql
+    DB_PORT: "3306"
+    DB_DATABASE: phober_staff
+    DB_USERNAME: root
+    DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-sqlite-default-env: &db-sqlite-default-env
+    DB_CONNECTION: sqlite
+
+x-db-auth-env: &db-auth-env
+    DB_AUTH_CONNECTION: mysql
+    DB_AUTH_HOST: db_mysql
+    DB_AUTH_PORT: "3306"
+    DB_AUTH_DATABASE: phober_auth
+    DB_AUTH_USERNAME: root
+    DB_AUTH_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Services
+# ──────────────────────────────────────────────────────────────────────────────
 
 services:
     notification-queue:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: notification-queue
         command: php artisan queue:work
         environment:
-            << : *common-env
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env,
+                *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
+            DISCORD_TOKEN: ${DISCORD_TOKEN:-}
+            DISCORD_SUPPORT_CHANNEL: ${DISCORD_SUPPORT_CHANNEL:-}
+            DISCORD_OTP_CHANNEL: ${DISCORD_OTP_CHANNEL:-}
+            TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+            TELEGRAM_OTP_CHANNEL: ${TELEGRAM_OTP_CHANNEL:-}
+            TELEGRAM_SUPPORT_CHANNEL: ${TELEGRAM_SUPPORT_CHANNEL:-}
+            DB_QUEUE: notification
         volumes:
             - *shared-laravel-volume
             - ./services/notification-server:/var/www/html
-        networks:
-            - private
 
     staff-queue:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: staff-queue
         command: php artisan queue:work --queue=staff
         environment:
-            <<: [*common-env, *reverb-env]
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *reverb-env,
+                *db-staff-default-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            QUEUE_CONNECTION: database
+            DB_QUEUE: staff
         volumes:
             - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
-        networks:
-            - private
 
     device-queue:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: device-queue
         command: php artisan queue:work --queue=device
         environment:
-            <<: [*common-env, *reverb-env]
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env, *reverb-env,
+                *db-device-default-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            QUEUE_CONNECTION: database
+            APP_URL: /hardware
+            AWS_URL: /s3/media
+            DB_QUEUE: device
         volumes:
             - *shared-laravel-volume
             - ./services/device-service:/var/www/html
-        networks:
-            - private
 
     staff-schedule:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: staff-schedule
         command: php artisan schedule:work
         environment:
-            <<: [*common-env, *reverb-env]
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *reverb-env,
+                *db-staff-default-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
-        networks:
-            - private
 
     device-schedule:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: device-schedule
         command: php artisan schedule:work
         environment:
-            <<: [*common-env, *reverb-env]
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *reverb-env,
+                *db-device-default-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             QUEUE_CONNECTION: database
         volumes:
             - *shared-laravel-volume
             - ./services/device-service:/var/www/html
-        networks:
-            - private
 
     ws:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: ws
         command: sh -c "php artisan reverb:start --host=0.0.0.0 --port=8080 --debug"
         environment:
-            << : *common-env
+            <<: [
+                *apache-env, *laravel-env, *redis-env,
+                *db-sqlite-default-env, *db-auth-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_AUTH_SERVER}
             BROADCAST_CONNECTION: reverb
             REVERB_APP_ID: ${REVERB_APP_ID:-phober}
             REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
             REVERB_APP_SECRET: ${REVERB_APP_SECRET:-phober-secret}
             REVERB_HOST: 0.0.0.0
-            REVERB_PORT: 8080
+            REVERB_PORT: "8080"
             REVERB_SCHEME: http
         volumes:
             - *shared-laravel-volume
             - ./services/auth-server:/var/www/html
-        networks:
-            - private
 
 networks:
     private:

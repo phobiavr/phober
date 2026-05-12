@@ -1,31 +1,19 @@
 name: phober-backend
 
-x-common-env: &common-env
-    APACHE_RUN_USER: "#1000"
-    APACHE_RUN_GROUP: "#1000"
-    APACHE_LOG_DIR: /var/log/apache2
-    APACHE_RUN_DIR: /var/run/apache2
-    APACHE_PID_FILE: /var/run/apache2/apache2.pid
-    APACHE_LOCK_DIR: /var/lock/apache2
-    APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
-    REDIS_CLIENT: predis
-    REDIS_HOST: redis
-    REDIS_PORT: 6379
-    CACHE_STORE: redis
-    SESSION_DRIVER: redis
-    QUEUE_CONNECTION: redis
+# ──────────────────────────────────────────────────────────────────────────────
+# Reusable building blocks
+# ──────────────────────────────────────────────────────────────────────────────
 
-x-reverb-env: &reverb-env
-    BROADCAST_CONNECTION: reverb
-    REVERB_APP_ID: ${REVERB_APP_ID:-phober}
-    REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
-    REVERB_APP_SECRET: ${REVERB_APP_SECRET:-phober-secret}
-    REVERB_HOST: ws
-    REVERB_PORT: 8080
-    REVERB_SCHEME: http
+x-php-image: &php-image abdukhaligov/phober-php-apache:2.0.0
 
-x-common-healthcheck-v2: &common-healthcheck-v2
-    test: [ "CMD", "curl", "-f", "http://localhost/up" ]
+x-php-base: &php-base
+    image: *php-image
+    restart: unless-stopped
+    networks: [private]
+    entrypoint: sh -c "apache2 -D FOREGROUND"
+
+x-healthcheck: &healthcheck
+    test: ["CMD", "curl", "-fsS", "http://localhost/up"]
     interval: 10m
     retries: 5
     start_period: 10m
@@ -34,57 +22,177 @@ x-common-healthcheck-v2: &common-healthcheck-v2
 x-shared-laravel-volume: &shared-laravel-volume
     ./shared/laravel-common:/var/www/html/shared:ro
 
+# ── env blocks ────────────────────────────────────────────────────────────────
+
+x-apache-env: &apache-env
+    APACHE_RUN_USER: "#1000"
+    APACHE_RUN_GROUP: "#1000"
+    APACHE_LOG_DIR: /var/log/apache2
+    APACHE_RUN_DIR: /var/run/apache2
+    APACHE_PID_FILE: /var/run/apache2/apache2.pid
+    APACHE_LOCK_DIR: /var/lock/apache2
+
+x-laravel-env: &laravel-env
+    APP_NAME: "Phober 6"
+    APP_ENV: ${APP_ENV:-local}
+    APP_DEBUG: ${APP_DEBUG:-true}
+    APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Baku}
+    APP_LOCALE: en
+    APP_FALLBACK_LOCALE: en
+    APP_MAINTENANCE_DRIVER: file
+    BCRYPT_ROUNDS: "12"
+    LOG_CHANNEL: stack
+    LOG_STACK: single
+    LOG_LEVEL: ${LOG_LEVEL:-debug}
+    TELESCOPE_ENABLED: ${TELESCOPE_ENABLED:-true}
+    FILESYSTEM_DISK: local
+    QUEUE_CONNECTION: database
+    DB_QUEUE_CONNECTION: db_shared
+
+x-redis-env: &redis-env
+    REDIS_CLIENT: predis
+    REDIS_HOST: redis
+    REDIS_PORT: "6379"
+    CACHE_STORE: redis
+    SESSION_DRIVER: redis
+    SESSION_LIFETIME: "120"
+
+x-mail-env: &mail-env
+    MAIL_MAILER: ${MAIL_MAILER:-log}
+    MAIL_HOST: ${MAIL_HOST:-mailhog}
+    MAIL_PORT: ${MAIL_PORT:-1025}
+    MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-hello@phober.test}
+    MAIL_FROM_NAME: Phober
+
+x-s3-env: &s3-env
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
+    AWS_DEFAULT_REGION: us-east-1
+    AWS_BUCKET: media
+    AWS_ENDPOINT: http://minio:9000
+    AWS_USE_PATH_STYLE_ENDPOINT: "true"
+
+x-reverb-env: &reverb-env
+    BROADCAST_CONNECTION: reverb
+    REVERB_APP_ID: ${REVERB_APP_ID:-phober}
+    REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
+    REVERB_APP_SECRET: ${REVERB_APP_SECRET:-phober-secret}
+    REVERB_HOST: ws
+    REVERB_PORT: "8080"
+    REVERB_SCHEME: http
+
+# ── per-database blocks (all MySQL, single instance) ──────────────────────────
+
+x-db-auth-env: &db-auth-env
+    DB_AUTH_CONNECTION: mysql
+    DB_AUTH_HOST: db_mysql
+    DB_AUTH_PORT: "3306"
+    DB_AUTH_DATABASE: phober_auth
+    DB_AUTH_USERNAME: root
+    DB_AUTH_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-device-env: &db-device-env
+    DB_DEVICE_CONNECTION: mysql
+    DB_DEVICE_HOST: db_mysql
+    DB_DEVICE_PORT: "3306"
+    DB_DEVICE_DATABASE: phober_device
+    DB_DEVICE_USERNAME: root
+    DB_DEVICE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-crm-env: &db-crm-env
+    DB_CRM_CONNECTION: mysql
+    DB_CRM_HOST: db_mysql
+    DB_CRM_PORT: "3306"
+    DB_CRM_DATABASE: phober_crm
+    DB_CRM_USERNAME: root
+    DB_CRM_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-staff-env: &db-staff-env
+    DB_STAFF_CONNECTION: mysql
+    DB_STAFF_HOST: db_mysql
+    DB_STAFF_PORT: "3306"
+    DB_STAFF_DATABASE: phober_staff
+    DB_STAFF_USERNAME: root
+    DB_STAFF_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-configs-env: &db-configs-env
+    DB_CONFIGS_CONNECTION: mysql
+    DB_CONFIGS_HOST: db_mysql
+    DB_CONFIGS_PORT: "3306"
+    DB_CONFIGS_DATABASE: phober_configs
+    DB_CONFIGS_USERNAME: root
+    DB_CONFIGS_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-shared-env: &db-shared-env
+    DB_SHARED_CONNECTION: mysql
+    DB_SHARED_HOST: db_mysql
+    DB_SHARED_PORT: "3306"
+    DB_SHARED_DATABASE: phober_shared
+    DB_SHARED_USERNAME: root
+    DB_SHARED_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+# Default DB_* block — each service points "default" at its own logical DB
+x-db-admin-default-env: &db-admin-default-env
+    DB_CONNECTION: mysql
+    DB_HOST: db_mysql
+    DB_PORT: "3306"
+    DB_DATABASE: phober_admin
+    DB_USERNAME: root
+    DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-device-default-env: &db-device-default-env
+    DB_CONNECTION: mysql
+    DB_HOST: db_mysql
+    DB_PORT: "3306"
+    DB_DATABASE: phober_device
+    DB_USERNAME: root
+    DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-crm-default-env: &db-crm-default-env
+    DB_CONNECTION: mysql
+    DB_HOST: db_mysql
+    DB_PORT: "3306"
+    DB_DATABASE: phober_crm
+    DB_USERNAME: root
+    DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+x-db-staff-default-env: &db-staff-default-env
+    DB_CONNECTION: mysql
+    DB_HOST: db_mysql
+    DB_PORT: "3306"
+    DB_DATABASE: phober_staff
+    DB_USERNAME: root
+    DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Services
+# ──────────────────────────────────────────────────────────────────────────────
 
 services:
     nginx-proxy-manager:
-      image: 'jc21/nginx-proxy-manager:latest'
-      container_name: nginx-proxy-manager
-      ports:
-        - '80:80'
-        - '81:81'
-        - '443:443'
-      volumes:
-        - ./docker/npm/data:/data
-        - ./docker/npm/letsencrypt:/etc/letsencrypt
-      networks:
-        - public
-        - private
-
-    adminpanel:
-        image: abdukhaligov/phober-php-apache:1.0.0
-        container_name: adminpanel
-        environment:
-            <<: [*common-env, *reverb-env]
-            APP_KEY: ${APP_KEY_ADMINPANEL}
-            AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-defaultaccesskey}
-            AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-defaultsecretkey}
-            AWS_DEFAULT_REGION: us-east-1
-            AWS_BUCKET: media
-            AWS_URL: "${API_GATEWAY_HOST:-https://localhost}:${API_GATEWAY_PORT:-8000}/s3"
-            AWS_ENDPOINT: 'http://minio:9000'
-            AWS_USE_PATH_STYLE_ENDPOINT: 'true'
-            DB_CONFIGS_DATABASE: '/var/www/html/database/configs.sqlite'
+        image: jc21/nginx-proxy-manager:latest
+        container_name: nginx-proxy-manager
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "81:81"
+            - "443:443"
         volumes:
-            - *shared-laravel-volume
-            - ./services/adminpanel:/var/www/html
-            - ./docker/sqlite/configs.sqlite:/var/www/html/database/configs.sqlite
-        networks:
-            - private
-            - public
-        entrypoint: sh -c "apache2 -D FOREGROUND"
+            - ./docker/npm/data:/data
+            - ./docker/npm/letsencrypt:/etc/letsencrypt
+        networks: [public, private]
 
     api-gateway:
         image: nginx:latest
         container_name: api-gateway
+        restart: unless-stopped
         volumes:
             - ./docker/api-gateway/certs/nginx.crt:/etc/nginx/ssl/nginx.crt:ro
             - ./docker/api-gateway/certs/nginx.key:/etc/nginx/ssl/nginx.key:ro
             - ./docker/api-gateway/certs/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
             - ./docker/api-gateway/nginx.conf:/etc/nginx/nginx.conf
             - ./docker/api-gateway/public:/etc/nginx/public:ro
-        networks:
-            - private
-            - public
+        networks: [public, private]
         depends_on:
             - notification-server
             - auth-server
@@ -92,102 +200,123 @@ services:
             - crm-service
             - staff-service
 
-    auth-server:
-        image: abdukhaligov/phober-php-apache:1.0.0
-        container_name: auth-server
+    adminpanel:
+        <<: *php-base
+        container_name: adminpanel
+        networks: [private, public]
+        healthcheck: *healthcheck
         environment:
-            << : *common-env
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env, *s3-env, *reverb-env,
+                *db-admin-default-env,
+                *db-auth-env, *db-device-env, *db-crm-env, *db-staff-env,
+                *db-configs-env, *db-shared-env,
+            ]
+            APP_KEY: ${APP_KEY_ADMINPANEL}
+            AWS_URL: "${API_GATEWAY_HOST:-http://api.phober.test}/s3"
+            DB_QUEUE: adminpanel
+        volumes:
+            - *shared-laravel-volume
+            - ./services/adminpanel:/var/www/html
+
+    auth-server:
+        <<: *php-base
+        container_name: auth-server
+        healthcheck: *healthcheck
+        environment:
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env, *reverb-env,
+                *db-auth-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_AUTH_SERVER}
+            DB_CONNECTION: sqlite
         volumes:
             - *shared-laravel-volume
             - ./services/auth-server:/var/www/html
-        networks:
-            - private
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
 
     config-server:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: config-server
+        healthcheck: *healthcheck
         environment:
-            << : *common-env
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env,
+                *db-configs-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_CONFIG_SERVER}
+            USE_CACHE: "false"
         volumes:
             - *shared-laravel-volume
             - ./services/config-server:/var/www/html
-            - ./docker/sqlite/configs.sqlite:/var/www/html/database/database.sqlite
-        networks:
-            - private
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
 
     notification-server:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: notification-server
+        healthcheck: *healthcheck
         environment:
-            << : *common-env
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env,
+                *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
+            DISCORD_TOKEN: ${DISCORD_TOKEN:-}
+            DISCORD_SUPPORT_CHANNEL: ${DISCORD_SUPPORT_CHANNEL:-}
+            DISCORD_OTP_CHANNEL: ${DISCORD_OTP_CHANNEL:-}
+            TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+            TELEGRAM_OTP_CHANNEL: ${TELEGRAM_OTP_CHANNEL:-}
+            TELEGRAM_SUPPORT_CHANNEL: ${TELEGRAM_SUPPORT_CHANNEL:-}
+            DB_QUEUE: notification
         volumes:
             - *shared-laravel-volume
             - ./services/notification-server:/var/www/html
-        networks:
-            - private
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
 
     device-service:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: device-service
+        healthcheck: *healthcheck
+        deploy:
+            replicas: 1
         environment:
-            <<: [*common-env, *reverb-env]
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env, *s3-env, *reverb-env,
+                *db-device-default-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            APP_URL: "/hardware"
-            AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-            AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-            AWS_DEFAULT_REGION: us-east-1
-            AWS_BUCKET: media
-            AWS_URL: '/s3/media'
-            AWS_ENDPOINT: 'http://minio:9000'
-            AWS_USE_PATH_STYLE_ENDPOINT: 'true'
-            QUEUE_CONNECTION: database
+            APP_URL: /hardware
+            AWS_URL: /s3/media
+            DB_QUEUE: device
         volumes:
             - *shared-laravel-volume
             - ./services/device-service:/var/www/html
-        networks:
-            - private
-        deploy:
-            replicas: 1
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
 
     crm-service:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: crm-service
+        healthcheck: *healthcheck
         environment:
-            << : *common-env
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env,
+                *db-crm-default-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_CRM_SERVICE}
         volumes:
             - *shared-laravel-volume
             - ./services/crm-service:/var/www/html
-        networks:
-            - private
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
 
     staff-service:
-        image: abdukhaligov/phober-php-apache:1.0.0
+        <<: *php-base
         container_name: staff-service
+        healthcheck: *healthcheck
         environment:
-            <<: [*common-env, *reverb-env]
+            <<: [
+                *apache-env, *laravel-env, *redis-env, *mail-env, *reverb-env,
+                *db-staff-default-env, *db-shared-env,
+            ]
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            QUEUE_CONNECTION: database
+            DB_QUEUE: staff
         volumes:
             - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
-        networks:
-            - private
-        entrypoint: sh -c "apache2 -D FOREGROUND"
-        healthcheck: *common-healthcheck-v2
 
 networks:
     private:
