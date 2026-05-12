@@ -225,7 +225,7 @@ services:
         healthcheck: *healthcheck
         environment:
             <<: [
-                *apache-env, *laravel-env, *redis-env, *mail-env, *reverb-env,
+                *apache-env, *laravel-env, *redis-env, *reverb-env,
                 *db-auth-env, *db-shared-env,
             ]
             APP_KEY: ${APP_KEY_AUTH_SERVER}

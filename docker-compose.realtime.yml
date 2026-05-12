@@ -194,7 +194,7 @@ services:
         environment:
             <<: [
                 *apache-env, *laravel-env, *redis-env,
-                *db-sqlite-default-env, *db-auth-env, *db-shared-env,
+                *db-auth-env, *db-shared-env,
             ]
             APP_KEY: ${APP_KEY_AUTH_SERVER}
             BROADCAST_CONNECTION: reverb
