@@ -31,7 +31,6 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
-            QUEUE_CONNECTION: redis
             DISCORD_TOKEN: ${DISCORD_TOKEN:-}
             DISCORD_SUPPORT_CHANNEL: ${DISCORD_SUPPORT_CHANNEL:-}
             DISCORD_OTP_CHANNEL: ${DISCORD_OTP_CHANNEL:-}
@@ -56,7 +55,6 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            QUEUE_CONNECTION: redis
             DB_QUEUE: staff
         volumes:
             - *shared-laravel-volume
@@ -76,7 +74,6 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            QUEUE_CONNECTION: redis
             APP_URL: /hardware
             AWS_URL: /s3/media
             DB_QUEUE: device
@@ -132,7 +129,6 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_AUTH_SERVER}
-            QUEUE_CONNECTION: redis
             BROADCAST_CONNECTION: reverb
             REVERB_APP_ID: ${REVERB_APP_ID:-phober}
             REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
