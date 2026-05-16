@@ -4,7 +4,7 @@ name: phober-realtime
 # Reusable building blocks
 # ──────────────────────────────────────────────────────────────────────────────
 
-x-php-image: &php-image abdukhaligov/phober-php-apache:2.0.0
+x-php-image: &php-image abdukhaligov/phober-php-apache:2.1.0
 
 x-php-base: &php-base
     image: *php-image
@@ -13,6 +13,9 @@ x-php-base: &php-base
 
 x-shared-laravel-volume: &shared-laravel-volume
     ./shared/laravel-common:/var/www/html/shared:ro
+
+x-php-ini: &php-ini ./docker/phober-php/php.ini:/usr/local/etc/php/conf.d/zz-phober.ini:ro
+x-php-opcache: &php-opcache ./docker/phober-php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Services
@@ -39,6 +42,8 @@ services:
             TELEGRAM_SUPPORT_CHANNEL: ${TELEGRAM_SUPPORT_CHANNEL:-}
             DB_QUEUE: notification
         volumes:
+            - *php-ini
+            - *php-opcache
             - *shared-laravel-volume
             - ./services/notification-server:/var/www/html
 
@@ -57,6 +62,8 @@ services:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
             DB_QUEUE: staff
         volumes:
+            - *php-ini
+            - *php-opcache
             - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
 
@@ -78,6 +85,8 @@ services:
             AWS_URL: /s3/media
             DB_QUEUE: device
         volumes:
+            - *php-ini
+            - *php-opcache
             - *shared-laravel-volume
             - ./services/device-service:/var/www/html
 
@@ -96,6 +105,8 @@ services:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
             QUEUE_CONNECTION: database
         volumes:
+            - *php-ini
+            - *php-opcache
             - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
 
@@ -114,6 +125,8 @@ services:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             QUEUE_CONNECTION: database
         volumes:
+            - *php-ini
+            - *php-opcache
             - *shared-laravel-volume
             - ./services/device-service:/var/www/html
 
@@ -137,6 +150,8 @@ services:
             REVERB_PORT: "8080"
             REVERB_SCHEME: http
         volumes:
+            - *php-ini
+            - *php-opcache
             - *shared-laravel-volume
             - ./services/auth-server:/var/www/html
 
