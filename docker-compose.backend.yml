@@ -170,11 +170,14 @@ services:
             - docker/env/reverb.env
             - docker/env/db-device-default.env
             - docker/env/db-shared-admin.env
+            - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             APP_URL: /hardware
             AWS_URL: /s3/media
-            DB_QUEUE: device
+            #DB_QUEUE: device
+            RABBITMQ_QUEUE: device
+            QUEUE_CONNECTION: rabbitmq
         volumes:
             - *php-ini
             - *php-opcache
@@ -212,9 +215,12 @@ services:
             - docker/env/reverb.env
             - docker/env/db-staff-default.env
             - docker/env/db-shared-admin.env
+            - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            DB_QUEUE: staff
+            #DB_QUEUE: staff
+            RABBITMQ_QUEUE: staff
+            QUEUE_CONNECTION: rabbitmq
         volumes:
             - *php-ini
             - *php-opcache

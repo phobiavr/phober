@@ -26,6 +26,20 @@ services:
         networks:
             - private
 
+    rabbitmq:
+        image: rabbitmq:3.13-management-alpine
+        container_name: rabbitmq
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-phober}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-secret}
+            RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-phober}
+        ports:
+            - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+        volumes:
+            - rabbitmq_data:/var/lib/rabbitmq
+        networks:
+            - private
+
     minio:
         image: minio/minio
         container_name: minio
@@ -45,6 +59,8 @@ volumes:
         name: phober_db_mysql_data
     redis_data:
         name: phober_redis_data
+    rabbitmq_data:
+        name: phober_rabbitmq_data
 
 networks:
     private:
