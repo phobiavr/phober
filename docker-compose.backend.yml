@@ -83,7 +83,9 @@ services:
         environment:
             APP_KEY: ${APP_KEY_ADMINPANEL}
             AWS_URL: "${API_GATEWAY_HOST:-http://api.phober.test}/s3"
+            QUEUE_CONNECTION: database
             DB_QUEUE: adminpanel
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -104,6 +106,9 @@ services:
         environment:
             APP_KEY: ${APP_KEY_AUTH_SERVER}
             DB_CONNECTION: sqlite
+            QUEUE_CONNECTION: database
+            DB_QUEUE: auth
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -124,6 +129,9 @@ services:
         environment:
             APP_KEY: ${APP_KEY_CONFIG_SERVER}
             USE_CACHE: "false"
+            QUEUE_CONNECTION: database
+            DB_QUEUE: config
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -148,7 +156,9 @@ services:
             TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
             TELEGRAM_OTP_CHANNEL: ${TELEGRAM_OTP_CHANNEL:-}
             TELEGRAM_SUPPORT_CHANNEL: ${TELEGRAM_SUPPORT_CHANNEL:-}
+            QUEUE_CONNECTION: database
             DB_QUEUE: notification
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -175,9 +185,11 @@ services:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             APP_URL: /hardware
             AWS_URL: /s3/media
-            #DB_QUEUE: device
-            RABBITMQ_QUEUE: device
-            QUEUE_CONNECTION: rabbitmq
+            #RABBITMQ_QUEUE: device
+            #QUEUE_CONNECTION: rabbitmq
+            QUEUE_CONNECTION: database
+            DB_QUEUE: device
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -197,6 +209,9 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_CRM_SERVICE}
+            QUEUE_CONNECTION: database
+            DB_QUEUE: crm
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -218,9 +233,11 @@ services:
             - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            #DB_QUEUE: staff
-            RABBITMQ_QUEUE: staff
-            QUEUE_CONNECTION: rabbitmq
+            #RABBITMQ_QUEUE: staff
+            #QUEUE_CONNECTION: rabbitmq
+            QUEUE_CONNECTION: database
+            DB_QUEUE: staff
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache

@@ -25,7 +25,7 @@ services:
     notification-queue:
         <<: *php-base
         container_name: notification-queue
-        command: php artisan queue:work --queue=notification
+        command: php artisan queue:listen --queue=notification
         env_file:
             - docker/env/apache.env
             - docker/env/laravel.env
@@ -40,7 +40,9 @@ services:
             TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
             TELEGRAM_OTP_CHANNEL: ${TELEGRAM_OTP_CHANNEL:-}
             TELEGRAM_SUPPORT_CHANNEL: ${TELEGRAM_SUPPORT_CHANNEL:-}
+            QUEUE_CONNECTION: database
             DB_QUEUE: notification
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -50,7 +52,7 @@ services:
     staff-queue:
         <<: *php-base
         container_name: staff-queue
-        command: php artisan queue:work --queue=staff
+        command: php artisan queue:listen --queue=staff
         env_file:
             - docker/env/apache.env
             - docker/env/laravel.env
@@ -61,9 +63,11 @@ services:
             - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            #DB_QUEUE: staff
-            RABBITMQ_QUEUE: staff
-            QUEUE_CONNECTION: rabbitmq
+            #RABBITMQ_QUEUE: staff
+            #QUEUE_CONNECTION: rabbitmq
+            QUEUE_CONNECTION: database
+            DB_QUEUE: staff
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache
@@ -73,7 +77,7 @@ services:
     device-queue:
         <<: *php-base
         container_name: device-queue
-        command: php artisan queue:work --queue=device
+        command: php artisan queue:listen --queue=device
         env_file:
             - docker/env/apache.env
             - docker/env/laravel.env
@@ -87,9 +91,11 @@ services:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             APP_URL: /hardware
             AWS_URL: /s3/media
-            #DB_QUEUE: device
-            RABBITMQ_QUEUE: device
-            QUEUE_CONNECTION: rabbitmq
+            #RABBITMQ_QUEUE: device
+            #QUEUE_CONNECTION: rabbitmq
+            QUEUE_CONNECTION: database
+            DB_QUEUE: device
+            DB_QUEUE_CONNECTION: db_shared
         volumes:
             - *php-ini
             - *php-opcache

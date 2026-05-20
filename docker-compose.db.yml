@@ -26,19 +26,19 @@ services:
         networks:
             - private
 
-    rabbitmq:
-        image: rabbitmq:3.13-management-alpine
-        container_name: rabbitmq
-        environment:
-            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-phober}
-            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-secret}
-            RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-phober}
-        ports:
-            - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
-        volumes:
-            - rabbitmq_data:/var/lib/rabbitmq
-        networks:
-            - private
+#    rabbitmq:
+#        image: rabbitmq:3.13-management-alpine
+#        container_name: rabbitmq
+#        environment:
+#            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-phober}
+#            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-secret}
+#            RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-phober}
+#        ports:
+#            - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+#        volumes:
+#            - rabbitmq_data:/var/lib/rabbitmq
+#        networks:
+#            - private
 
     minio:
         image: minio/minio
