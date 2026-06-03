@@ -172,8 +172,7 @@ All staff routes are prefixed `/staff/` at the gateway level (stripped before hi
 4. Creates session on the invoice.
 5. If `isScheduled() = false`: status=QUEUE, started_at=null, action=`'queue'`.
    If `isScheduled() = true`: status=ACTIVE, started_at=now(), action=`'start'`.
-6. Dispatches `HandleSessionSchedule($instanceId, $action, $time, $sessionId, $session->created_at->toIso8601String())->onQueue('device')`.
-7. Fires `SessionCreated` event → `SessionCreatedListener` → broadcasts `SessionCreatedPublic` + `SessionCreatedPrivate($sessionId, $instanceId)`.
+6. Fires `SessionCreated($session, $action, $time->getMins())` → constructor dispatches `HandleSessionSchedule` to 'device' queue + broadcasts `SessionCreatedPublic` + `SessionCreatedPrivate($sessionId, $instanceId)`.
 
 **`start(int $id)`** — requires QUEUE status. Sets ACTIVE + `started_at = now()`. Fires `SessionStarted($session)` → dispatches `HandleSessionSchedule($instanceId, 'start', $time, $sessionId, $startedAt)->onQueue('device')`.
 
@@ -193,13 +192,20 @@ All staff routes are prefixed `/staff/` at the gateway level (stripped before hi
 
 ### Events Pattern
 
-`SessionStarted`, `SessionCanceled`, `SessionFinished` dispatch `HandleSessionSchedule` **inside their own constructor** — no external subscriber. This prevents double-dispatch that occurred with the old `SessionScheduleSubscriber` pattern.
+All four session events do their work **inside their own constructor** — no external listeners or subscribers.
 
-`SessionCreated` is a broadcast-only event (no queue job dispatch). It triggers `SessionCreatedListener` → broadcasts two WebSocket events.
+| Event | Constructor does |
+|---|---|
+| `SessionCreated($session, $action, $mins)` | `HandleSessionSchedule::dispatch(instanceId, action, mins, sessionId, createdAt)->onQueue('device')` + `broadcast(SessionCreatedPublic)` + `broadcast(SessionCreatedPrivate(sessionId, instanceId))` |
+| `SessionStarted($session)` | `HandleSessionSchedule::dispatch(instanceId, 'start', time, sessionId, startedAt)->onQueue('device')` |
+| `SessionCanceled($session)` | `HandleSessionSchedule::dispatch(instanceId, 'cancel')->onQueue('device')` |
+| `SessionFinished($session)` | `HandleSessionSchedule::dispatch(instanceId, 'finish')->onQueue('device')` |
+
+`SessionCreatedListener` exists but is **dead code** — not registered anywhere.
 
 ### EventServiceProvider
 
-Only one listener registered: `SessionCreated` → `SessionCreatedListener`. No `$subscribe` array.
+`$listen` array is empty (commented out). No `$subscribe`. No active listeners.
 
 ### AppServiceProvider
 
