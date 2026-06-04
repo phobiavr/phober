@@ -1,4 +1,4 @@
-name: phober-dozzle
+name: phober-observability
 
 services:
     dozzle:
@@ -11,6 +11,16 @@ services:
             DOZZLE_FILTER: "name=adminpanel|auth-server|config-server|notification-server|device-service|crm-service|staff-service|notification-queue|staff-queue|device-queue|device-schedule|ws"
             DOZZLE_LEVEL: debug
             DOZZLE_NO_ANALYTICS: "true"
+        ports:
+            - "${DOZZLE_PORT:-9999}:8080"
+        networks: [public, private]
+
+    buggregator:
+        image: ghcr.io/buggregator/server:latest
+        container_name: buggregator
+        restart: unless-stopped
+        ports:
+            - "${BUGGREGATOR_PORT:-8001}:8000"
         networks: [public, private]
 
 networks:

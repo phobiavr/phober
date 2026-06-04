@@ -17,6 +17,11 @@ x-shared-laravel-package: &shared-laravel-package
 x-php-ini: &php-ini ./docker/phober-php/php.ini:/usr/local/etc/php/conf.d/zz-phober.ini:ro
 x-php-opcache: &php-opcache ./docker/phober-php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
 
+x-logging-env: &logging-env
+    LOG_CHANNEL: stack
+    LOG_STACK: "stderr,sentry"
+    LOG_LEVEL: debug
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Services
 # ──────────────────────────────────────────────────────────────────────────────
@@ -33,8 +38,9 @@ services:
             - docker/env/mail.env
             - docker/env/db-shared-admin.env
         environment:
+            <<: *logging-env
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
-            LOG_CHANNEL: stderr
+            SENTRY_DSN: "http://sentry@buggregator:8000/notification-server"
             DISCORD_TOKEN: ${DISCORD_TOKEN:-}
             DISCORD_SUPPORT_CHANNEL: ${DISCORD_SUPPORT_CHANNEL:-}
             DISCORD_OTP_CHANNEL: ${DISCORD_OTP_CHANNEL:-}
@@ -63,8 +69,9 @@ services:
             - docker/env/db-shared-admin.env
             - docker/env/rabbitmq.env
         environment:
+            <<: *logging-env
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
-            LOG_CHANNEL: stderr
+            SENTRY_DSN: "http://sentry@buggregator:8000/staff-service"
             #RABBITMQ_QUEUE: staff
             #QUEUE_CONNECTION: rabbitmq
             QUEUE_CONNECTION: database
@@ -90,8 +97,9 @@ services:
             - docker/env/db-shared-admin.env
             - docker/env/rabbitmq.env
         environment:
+            <<: *logging-env
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            LOG_CHANNEL: stderr
+            SENTRY_DSN: "http://sentry@buggregator:8000/device-service"
             APP_URL: /hardware
             AWS_URL: /s3/media
             #RABBITMQ_QUEUE: device
@@ -136,8 +144,9 @@ services:
             - docker/env/db-device-default.env
             - docker/env/db-shared-admin.env
         environment:
+            <<: *logging-env
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
-            LOG_CHANNEL: stderr
+            SENTRY_DSN: "http://sentry@buggregator:8000/device-service"
         volumes:
             - *php-ini
             - *php-opcache
@@ -155,8 +164,9 @@ services:
             - docker/env/db-auth-admin.env
             - docker/env/db-shared-admin.env
         environment:
+            <<: *logging-env
             APP_KEY: ${APP_KEY_AUTH_SERVER}
-            LOG_CHANNEL: stderr
+            SENTRY_DSN: "http://sentry@buggregator:8000/ws"
             BROADCAST_CONNECTION: reverb
             REVERB_APP_ID: ${REVERB_APP_ID:-phober}
             REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}
