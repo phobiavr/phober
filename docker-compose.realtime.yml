@@ -34,6 +34,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
+            LOG_CHANNEL: stderr
             DISCORD_TOKEN: ${DISCORD_TOKEN:-}
             DISCORD_SUPPORT_CHANNEL: ${DISCORD_SUPPORT_CHANNEL:-}
             DISCORD_OTP_CHANNEL: ${DISCORD_OTP_CHANNEL:-}
@@ -63,6 +64,7 @@ services:
             - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
+            LOG_CHANNEL: stderr
             #RABBITMQ_QUEUE: staff
             #QUEUE_CONNECTION: rabbitmq
             QUEUE_CONNECTION: database
@@ -89,6 +91,7 @@ services:
             - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
+            LOG_CHANNEL: stderr
             APP_URL: /hardware
             AWS_URL: /s3/media
             #RABBITMQ_QUEUE: device
@@ -134,6 +137,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
+            LOG_CHANNEL: stderr
         volumes:
             - *php-ini
             - *php-opcache
@@ -152,6 +156,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_AUTH_SERVER}
+            LOG_CHANNEL: stderr
             BROADCAST_CONNECTION: reverb
             REVERB_APP_ID: ${REVERB_APP_ID:-phober}
             REVERB_APP_KEY: ${REVERB_APP_KEY:-phober-key}

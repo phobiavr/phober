@@ -82,6 +82,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_ADMINPANEL}
+            LOG_CHANNEL: stderr
             AWS_URL: "${API_GATEWAY_HOST:-http://api.phober.test}/s3"
             QUEUE_CONNECTION: database
             DB_QUEUE: adminpanel
@@ -105,6 +106,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_AUTH_SERVER}
+            LOG_CHANNEL: stderr
             DB_CONNECTION: sqlite
             QUEUE_CONNECTION: database
             DB_QUEUE: auth
@@ -128,6 +130,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_CONFIG_SERVER}
+            LOG_CHANNEL: stderr
             USE_CACHE: "false"
             QUEUE_CONNECTION: database
             DB_QUEUE: config
@@ -150,6 +153,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
+            LOG_CHANNEL: stderr
             DISCORD_TOKEN: ${DISCORD_TOKEN:-}
             DISCORD_SUPPORT_CHANNEL: ${DISCORD_SUPPORT_CHANNEL:-}
             DISCORD_OTP_CHANNEL: ${DISCORD_OTP_CHANNEL:-}
@@ -183,6 +187,7 @@ services:
             - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
+            LOG_CHANNEL: stderr
             APP_URL: /hardware
             AWS_URL: /s3/media
             #RABBITMQ_QUEUE: device
@@ -209,6 +214,7 @@ services:
             - docker/env/db-shared-admin.env
         environment:
             APP_KEY: ${APP_KEY_CRM_SERVICE}
+            LOG_CHANNEL: stderr
             QUEUE_CONNECTION: database
             DB_QUEUE: crm
             DB_QUEUE_CONNECTION: db_shared
@@ -233,6 +239,7 @@ services:
             - docker/env/rabbitmq.env
         environment:
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
+            LOG_CHANNEL: stderr
             #RABBITMQ_QUEUE: staff
             #QUEUE_CONNECTION: rabbitmq
             QUEUE_CONNECTION: database
