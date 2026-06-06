@@ -30,7 +30,7 @@ services:
     notification-queue:
         <<: *php-base
         container_name: notification-queue
-        command: php artisan queue:listen --queue=notification
+        command: php artisan queue:work --queue=notification
         env_file:
             - docker/env/apache.env
             - docker/env/laravel.env
@@ -59,7 +59,7 @@ services:
     staff-queue:
         <<: *php-base
         container_name: staff-queue
-        command: php artisan queue:listen --queue=staff
+        command: php artisan queue:work --queue=staff
         env_file:
             - docker/env/apache.env
             - docker/env/laravel.env
@@ -86,7 +86,7 @@ services:
     device-queue:
         <<: *php-base
         container_name: device-queue
-        command: php artisan queue:listen --queue=device
+        command: php artisan queue:work --queue=device
         env_file:
             - docker/env/apache.env
             - docker/env/laravel.env
