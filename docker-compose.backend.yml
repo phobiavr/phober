@@ -87,7 +87,7 @@ services:
             <<: *logging-env
             APP_KEY: ${APP_KEY_ADMINPANEL}
             SENTRY_DSN: "http://sentry@buggregator:8000/adminpanel"
-            AWS_URL: "${API_GATEWAY_HOST:-http://api.phober.test}/s3"
+            AWS_URL: "${API_GATEWAY_HOST:-https://api.phober.test}/s3"
             QUEUE_CONNECTION: database
             DB_QUEUE: adminpanel
             DB_QUEUE_CONNECTION: db_shared

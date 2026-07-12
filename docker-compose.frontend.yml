@@ -10,7 +10,7 @@ services:
             - ./services/staff-app:/app
             - /app/node_modules
         environment:
-            VITE_API_URL: ${VITE_API_URL:-http://api.phober.test}
+            VITE_API_URL: ${VITE_API_URL:-https://api.phober.test}
             VITE_REVERB_KEY: ${REVERB_APP_KEY:-phober-key}
         networks:
             - public
