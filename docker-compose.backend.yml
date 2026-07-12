@@ -53,9 +53,6 @@ services:
         container_name: api-gateway
         restart: unless-stopped
         volumes:
-            - ./docker/api-gateway/certs/nginx.crt:/etc/nginx/ssl/nginx.crt:ro
-            - ./docker/api-gateway/certs/nginx.key:/etc/nginx/ssl/nginx.key:ro
-            - ./docker/api-gateway/certs/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
             - ./docker/api-gateway/nginx.conf:/etc/nginx/nginx.conf
             - ./docker/api-gateway/public:/etc/nginx/public:ro
         networks: [public, private]
@@ -65,6 +62,7 @@ services:
             - device-service
             - crm-service
             - staff-service
+            - config-server
 
     adminpanel:
         <<: *php-base
