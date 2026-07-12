@@ -66,6 +66,13 @@ The folder is configured with the `spatie/medialibrary` package, facilitating se
     git submodule update --remote --merge
     ```
 
+   <details>
+      <summary>Notes</summary>
+
+   Even with `--recurse-submodules` in step 1, a submodule can occasionally fail to clone during the initial bulk clone (e.g. a transient network/auth hiccup) and end up registered but not checked out. Run `git submodule status` — any path prefixed with `-` means that submodule wasn't initialized; step 2 above re-runs the init and will pick up the stragglers.
+   </details>
+
+
 3. Ensure you have the `auth.json` file configured in your `adminpanel` directory:
     ```bash
     cp services/adminpanel/auth.json.example services/adminpanel/auth.json
