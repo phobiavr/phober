@@ -19,37 +19,6 @@ if ! command -v dialog &> /dev/null; then
     fi
 fi
 
-# macOS-compatible spinner: /proc does not exist on macOS
-show_spinner() {
-    local pid=$1
-    local delay=0.1
-    local spinner='|/-\'
-
-    while kill -0 "$pid" 2>/dev/null; do
-        for i in $(seq 0 3); do
-            printf "\r%s " "${spinner:$i:1}"
-            sleep $delay
-        done
-    done
-    printf "\r"
-}
-
-# Function to run migration or seeding commands for services
-run_command() {
-    local service_name=$1
-    local command=$2
-    local action=$3
-
-    echo -e "Running ${action} for ${YELLOW}${service_name}${NC}..."
-    docker-compose exec ${service_name} php artisan ${command} 2>&1
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}${service_name} ${action} completed successfully.${NC}"
-    else
-        echo -e "${RED}${service_name} ${action} failed.${NC}"
-    fi
-    echo -e "${CYAN}----------------------------------------${NC}"
-}
-
 # Combined MySQL and SQL Server Initialization
 initialize_databases() {
     local script_dir
@@ -104,12 +73,7 @@ initialize_databases() {
 selected=$(dialog --title "Select Tasks to Run" --checklist \
 "Choose the tasks you want to execute:" 20 78 10 \
 "1" "Database Initialization (MySQL & SQL Server)" ON \
-"2" "Initialize Applications and Copy .env" ON \
-"3" "Run Config Updates" ON \
-"4" "Run Storage Link" ON \
-"5" "Run Migrations" ON \
-"6" "Run Hostname updates" ON \
-"7" "Run Seeders" OFF 3>&1 1>&2 2>&3)
+"2" "Initialize Applications" ON 3>&1 1>&2 2>&3)
 
 exitcode=$?
 if [ $exitcode -ne 0 ]; then
@@ -132,7 +96,7 @@ for task in $selected; do
             initialize_databases
             ;;
         "2")
-            echo -e "${CYAN}Initializing applications and copying .env files...${NC}"
+            echo -e "${CYAN}Initializing applications...${NC}"
             applications=(
                 "adminpanel"
                 "config-server"
@@ -146,20 +110,12 @@ for task in $selected; do
                 container_name="$app_name"
                 app_start_time=$(date +%s)
                 if docker ps --format '{{.Names}}' | grep -q "$container_name"; then
-                    if ! docker exec -i "$container_name" bash -c "test -f /var/www/html/.env"; then
-                        if docker exec -i "$container_name" bash -c "test -f /var/www/html/.env.example"; then
-                            docker exec -i "$container_name" bash -c "cp /var/www/html/.env.example /var/www/html/.env"
-                            echo -e "Copied .env for ${YELLOW}$app_name${NC}"
-                        else
-                            echo -e "${RED}.env.example not found for ${YELLOW}$app_name${NC}"
-                        fi
-                    fi
                     echo -e "Initializing ${YELLOW}$app_name${NC}..."
-                    docker exec -i "$container_name" bash -c "cd /var/www/html && composer install" > /dev/null 2>&1 &
-                    show_spinner $!
+                    docker exec -i "$container_name" bash -c "cd /var/www/html && composer install"
+                    composer_exit=$?
                     app_end_time=$(date +%s)
                     app_total_time=$((app_end_time - app_start_time))
-                    if [ $? -eq 0 ]; then
+                    if [ $composer_exit -eq 0 ]; then
                         echo -e "${YELLOW}$app_name ${GREEN}initialized successfully in ${CYAN}$app_total_time${GREEN} seconds.${NC}"
                     else
                         echo -e "${YELLOW}$app_name ${RED}failed to initialize in ${CYAN}$app_total_time${RED} seconds.${NC}"
@@ -169,53 +125,6 @@ for task in $selected; do
                 fi
                 echo -e "${CYAN}----------------------------------------${NC}"
             done
-            ;;
-        "3")
-            config_clients=(
-                "notification-server"
-                "auth-server"
-                "device-service"
-                "crm-service"
-                "staff-service"
-            )
-            for service in "${config_clients[@]}"; do
-                run_command $service "config-client:update" "config update"
-            done
-            ;;
-        "4")
-            storage_services=(
-                "adminpanel"
-                "device-service"
-            )
-            for service in "${storage_services[@]}"; do
-                run_command $service "storage:link" "storage link creation"
-            done
-            ;;
-        "5")
-            migration_services=(
-                "adminpanel"
-                "auth-server"
-                "notification-server"
-            )
-            for service in "${migration_services[@]}"; do
-                run_command $service "migrate" "migration"
-            done
-            ;;
-        "6")
-            hostname_services=(
-                "auth-server"
-                "notification-server"
-                "device-service"
-                "crm-service"
-                "config-server"
-                "staff-service"
-            )
-            for service in "${hostname_services[@]}"; do
-                run_command $service "hostname:update $service" "hostname update"
-            done
-            ;;
-        "7")
-            run_command "adminpanel" "db:seed" "seeding"
             ;;
     esac
 done
