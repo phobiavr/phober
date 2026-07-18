@@ -9,6 +9,7 @@
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
     <data-source source="LOCAL" name="Redis" uuid="b819e7ff-0727-4a99-8bbf-4b8f456af9e3">
+      <driver-ref>redis</driver-ref>
       <synchronize>true</synchronize>
       <configured-by-url>true</configured-by-url>
       <jdbc-driver>jdbc.RedisDriver</jdbc-driver>

@@ -38,7 +38,17 @@ services:
     nginx-proxy-manager:
         image: jc21/nginx-proxy-manager:latest
         container_name: nginx-proxy-manager
-        restart: unless-stopped
+        entrypoint:
+            - /bin/sh
+            - -c
+            - |
+                if [ ! -f /certs/phober.test.pem ] || [ ! -f /certs/phober.test-key.pem ]; then
+                    echo "Phober: local SSL certificate not found in ./docker/certs. Run on the host:"
+                    echo "  mkcert -install"
+                    echo '  mkcert -cert-file docker/certs/phober.test.pem -key-file docker/certs/phober.test-key.pem phober.test "*.phober.test" localhost 127.0.0.1'
+                    exit 1
+                fi
+                exec /init
         ports:
             - "80:80"
             - "81:81"
@@ -46,6 +56,8 @@ services:
         volumes:
             - ./docker/npm/data:/data
             - ./docker/npm/letsencrypt:/etc/letsencrypt
+            - ./docker/npm/migrations/20260301000000_seed_phober_ssl.js:/app/migrations/20260301000000_seed_phober_ssl.js:ro
+            - ./docker/certs:/certs:ro
         networks: [public, private]
 
     api-gateway:
