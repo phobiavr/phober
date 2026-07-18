@@ -1,2 +1,4 @@
 /logs/
 database.sqlite
+/keys.json
+/database.sqlite
