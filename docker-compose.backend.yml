@@ -95,10 +95,12 @@ services:
             - docker/env/db-staff-admin.env
             - docker/env/db-configs-admin.env
             - docker/env/db-shared-admin.env
+            - docker/env/otel.env
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_ADMINPANEL}
             SENTRY_DSN: "http://sentry@buggregator:8000/adminpanel"
+            OTEL_SERVICE_NAME: adminpanel
             AWS_URL: "${API_GATEWAY_HOST:-https://api.phober.test}/s3"
             QUEUE_CONNECTION: database
             DB_QUEUE: adminpanel
@@ -120,10 +122,12 @@ services:
             - docker/env/reverb.env
             - docker/env/db-auth-admin.env
             - docker/env/db-shared-admin.env
+            - docker/env/otel.env
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_AUTH_SERVER}
             SENTRY_DSN: "http://sentry@buggregator:8000/auth-server"
+            OTEL_SERVICE_NAME: auth-server
             DB_CONNECTION: sqlite
             QUEUE_CONNECTION: database
             DB_QUEUE: auth
@@ -145,10 +149,12 @@ services:
             - docker/env/mail.env
             - docker/env/db-configs-admin.env
             - docker/env/db-shared-admin.env
+            - docker/env/otel.env
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_CONFIG_SERVER}
             SENTRY_DSN: "http://sentry@buggregator:8000/config-server"
+            OTEL_SERVICE_NAME: config-server
             USE_CACHE: "false"
             QUEUE_CONNECTION: database
             DB_QUEUE: config
@@ -169,10 +175,12 @@ services:
             - docker/env/redis.env
             - docker/env/mail.env
             - docker/env/db-shared-admin.env
+            - docker/env/otel.env
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
             SENTRY_DSN: "http://sentry@buggregator:8000/notification-server"
+            OTEL_SERVICE_NAME: notification-server
             DISCORD_TOKEN: ${DISCORD_TOKEN:-}
             DISCORD_SUPPORT_CHANNEL: ${DISCORD_SUPPORT_CHANNEL:-}
             DISCORD_OTP_CHANNEL: ${DISCORD_OTP_CHANNEL:-}
@@ -204,10 +212,12 @@ services:
             - docker/env/db-device-default.env
             - docker/env/db-shared-admin.env
             - docker/env/rabbitmq.env
+            - docker/env/otel.env
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             SENTRY_DSN: "http://sentry@buggregator:8000/device-service"
+            OTEL_SERVICE_NAME: device-service
             APP_URL: /hardware
             AWS_URL: /s3/media
             #RABBITMQ_QUEUE: device
@@ -232,10 +242,12 @@ services:
             - docker/env/mail.env
             - docker/env/db-crm-default.env
             - docker/env/db-shared-admin.env
+            - docker/env/otel.env
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_CRM_SERVICE}
             SENTRY_DSN: "http://sentry@buggregator:8000/crm-service"
+            OTEL_SERVICE_NAME: crm-service
             QUEUE_CONNECTION: database
             DB_QUEUE: crm
             DB_QUEUE_CONNECTION: db_shared
@@ -258,10 +270,12 @@ services:
             - docker/env/db-staff-default.env
             - docker/env/db-shared-admin.env
             - docker/env/rabbitmq.env
+            - docker/env/otel.env
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
             SENTRY_DSN: "http://sentry@buggregator:8000/staff-service"
+            OTEL_SERVICE_NAME: staff-service
             #RABBITMQ_QUEUE: staff
             #QUEUE_CONNECTION: rabbitmq
             QUEUE_CONNECTION: database

@@ -23,6 +23,14 @@ services:
             - "${BUGGREGATOR_PORT:-8001}:8000"
         networks: [public, private]
 
+    zipkin:
+        image: openzipkin/zipkin:latest
+        container_name: zipkin
+        restart: unless-stopped
+        ports:
+            - "${ZIPKIN_PORT:-9411}:9411"
+        networks: [public, private]
+
 networks:
     private:
         external: true
