@@ -99,6 +99,7 @@ services:
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_ADMINPANEL}
+            SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/adminpanel"
             OTEL_SERVICE_NAME: adminpanel
             AWS_URL: "${API_GATEWAY_HOST:-https://api.phober.test}/s3"
@@ -126,6 +127,7 @@ services:
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_AUTH_SERVER}
+            SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/auth-server"
             OTEL_SERVICE_NAME: auth-server
             DB_CONNECTION: sqlite
@@ -153,6 +155,7 @@ services:
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_CONFIG_SERVER}
+            SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/config-server"
             OTEL_SERVICE_NAME: config-server
             USE_CACHE: "false"
@@ -179,6 +182,7 @@ services:
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_NOTIFICATION_SERVER}
+            SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/notification-server"
             OTEL_SERVICE_NAME: notification-server
             DISCORD_TOKEN: ${DISCORD_TOKEN:-}
@@ -216,6 +220,7 @@ services:
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
+            SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/device-service"
             OTEL_SERVICE_NAME: device-service
             APP_URL: /hardware
@@ -246,6 +251,7 @@ services:
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_CRM_SERVICE}
+            SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/crm-service"
             OTEL_SERVICE_NAME: crm-service
             QUEUE_CONNECTION: database
@@ -274,6 +280,7 @@ services:
         environment:
             <<: *logging-env
             APP_KEY: ${APP_KEY_STAFF_SERVICE}
+            SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/staff-service"
             OTEL_SERVICE_NAME: staff-service
             #RABBITMQ_QUEUE: staff
