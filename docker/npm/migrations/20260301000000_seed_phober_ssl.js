@@ -18,6 +18,7 @@ const PROXY_HOSTS = [
 	{ domain_names: ["staff.phober.test"], forward_host: "staff-app", forward_port: 5173 },
 	{ domain_names: ["bugs.phober.test"], forward_host: "buggregator", forward_port: 8000 },
 	{ domain_names: ["logs.phober.test"], forward_host: "dozzle", forward_port: 8080 },
+	{ domain_names: ["zipkin.phober.test"], forward_host: "zipkin", forward_port: 9411 },
 ];
 
 const formatDate = (date) => date.toISOString().slice(0, 19).replace("T", " ");
