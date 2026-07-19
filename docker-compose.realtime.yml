@@ -107,6 +107,7 @@ services:
             <<: *logging-env
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             SERVICE_SECRET: ${SERVICE_SECRET}
+            OVERLAY_SECRET: ${OVERLAY_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/device-service"
             OTEL_SERVICE_NAME: device-queue
             APP_URL: /hardware
@@ -158,6 +159,7 @@ services:
             <<: *logging-env
             APP_KEY: ${APP_KEY_DEVICE_SERVICE}
             SERVICE_SECRET: ${SERVICE_SECRET}
+            OVERLAY_SECRET: ${OVERLAY_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/device-service"
             OTEL_SERVICE_NAME: device-schedule
         volumes:
