@@ -11,8 +11,8 @@ x-php-base: &php-base
     restart: unless-stopped
     networks: [private]
 
-x-shared-laravel-package: &shared-laravel-package
-    ./shared/laravel-common:/var/www/html/vendor/phobiavr/phober-laravel-common
+x-shared-laravel-volume: &shared-laravel-volume
+    ./shared/laravel-common:/var/www/html/shared/laravel-common:ro
 
 x-php-ini: &php-ini ./docker/phober-php/php.ini:/usr/local/etc/php/conf.d/zz-phober.ini:ro
 x-php-opcache: &php-opcache ./docker/phober-php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
@@ -56,7 +56,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/notification-server:/var/www/html
 
     staff-queue:
@@ -86,7 +86,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
 
     device-queue:
@@ -119,7 +119,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/device-service:/var/www/html
 
 #    staff-schedule:
@@ -139,7 +139,7 @@ services:
 #        volumes:
 #            - *php-ini
 #            - *php-opcache
-#            - *shared-laravel-package
+#            - *shared-laravel-volume
 #            - ./services/staff-service:/var/www/html
 
     device-schedule:
@@ -163,7 +163,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/device-service:/var/www/html
 
     ws:
@@ -192,7 +192,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/auth-server:/var/www/html
 
 networks:

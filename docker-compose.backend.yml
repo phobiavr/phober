@@ -19,8 +19,8 @@ x-healthcheck: &healthcheck
     start_period: 10m
     timeout: 1m
 
-x-shared-laravel-package: &shared-laravel-package
-    ./shared/laravel-common:/var/www/html/vendor/phobiavr/phober-laravel-common
+x-shared-laravel-volume: &shared-laravel-volume
+    ./shared/laravel-common:/var/www/html/shared/laravel-common:ro
 
 x-php-ini: &php-ini ./docker/phober-php/php.ini:/usr/local/etc/php/conf.d/zz-phober.ini:ro
 x-php-opcache: &php-opcache ./docker/phober-php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
@@ -109,7 +109,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/adminpanel:/var/www/html
 
     auth-server:
@@ -137,7 +137,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/auth-server:/var/www/html
 
     config-server:
@@ -165,7 +165,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/config-server:/var/www/html
 
     notification-server:
@@ -197,7 +197,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/notification-server:/var/www/html
 
     device-service:
@@ -233,7 +233,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/device-service:/var/www/html
 
     crm-service:
@@ -260,7 +260,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/crm-service:/var/www/html
 
     staff-service:
@@ -291,7 +291,7 @@ services:
         volumes:
             - *php-ini
             - *php-opcache
-            - *shared-laravel-package
+            - *shared-laravel-volume
             - ./services/staff-service:/var/www/html
 
 networks:
