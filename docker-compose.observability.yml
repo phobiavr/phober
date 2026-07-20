@@ -31,6 +31,12 @@ services:
             - "${ZIPKIN_PORT:-9411}:9411"
         networks: [public, private]
 
+    ws-inspector:
+        image: abdukhaligov/ws-inspector:latest
+        container_name: ws-inspector
+        restart: unless-stopped
+        networks: [public, private]
+
 networks:
     private:
         external: true
