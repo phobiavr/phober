@@ -122,6 +122,7 @@ services:
             - docker/env/redis.env
             - docker/env/reverb.env
             - docker/env/db-auth-admin.env
+            - docker/env/db-auth-default.env
             - docker/env/db-shared-admin.env
             - docker/env/otel.env
         environment:
@@ -130,7 +131,6 @@ services:
             SERVICE_SECRET: ${SERVICE_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/auth-server"
             OTEL_SERVICE_NAME: auth-server
-            DB_CONNECTION: sqlite
             QUEUE_CONNECTION: database
             DB_QUEUE: auth
             DB_QUEUE_CONNECTION: db_shared
@@ -150,6 +150,7 @@ services:
             - docker/env/redis.env
             - docker/env/mail.env
             - docker/env/db-configs-admin.env
+            - docker/env/db-configs-default.env
             - docker/env/db-shared-admin.env
             - docker/env/otel.env
         environment:
