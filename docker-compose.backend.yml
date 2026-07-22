@@ -100,6 +100,7 @@ services:
             <<: *logging-env
             APP_KEY: ${APP_KEY_ADMINPANEL}
             SERVICE_SECRET: ${SERVICE_SECRET}
+            OVERLAY_SECRET: ${OVERLAY_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/adminpanel"
             OTEL_SERVICE_NAME: adminpanel
             AWS_URL: "${API_GATEWAY_HOST:-https://api.phober.test}/s3"
