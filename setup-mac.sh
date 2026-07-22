@@ -19,7 +19,7 @@ if ! command -v dialog &> /dev/null; then
     fi
 fi
 
-# Combined MySQL and SQL Server Initialization
+# MySQL Initialization
 initialize_databases() {
     local script_dir
     script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -27,9 +27,7 @@ initialize_databases() {
     echo -e "${YELLOW}Executing MySQL SQL files...${NC}"
     local mysql_ok=1
     for sql_file in \
-            "$script_dir/docker/mysql/00-init-db.sql" \
-            "$script_dir/docker/mysql/10-structure.sql" \
-            "$script_dir/docker/mysql/20-data.sql"; do
+            "$script_dir/docker/mysql/init-db.sql"; do
         [ -f "$sql_file" ] || continue
         echo -e "  Running ${CYAN}$(basename "$sql_file")${NC}..."
         out=$(docker exec -i db_mysql mysql -uroot -p"${MYSQL_ROOT_PASSWORD:-root}" < "$sql_file" 2>&1)
@@ -45,34 +43,12 @@ initialize_databases() {
         echo -e "${RED}MySQL initialization failed.${NC}"
     fi
     echo -e "${CYAN}----------------------------------------${NC}"
-
-    echo -e "${YELLOW}Executing SQL Server SQL files...${NC}"
-    local sqlsrv_ok=1
-    for sql_file in \
-            "$script_dir/docker/sqlsrv/00-init-db.sql" \
-            "$script_dir/docker/sqlsrv/10-structure.sql" \
-            "$script_dir/docker/sqlsrv/20-data.sql"; do
-        [ -f "$sql_file" ] || continue
-        echo -e "  Running ${CYAN}$(basename "$sql_file")${NC}..."
-        out=$(docker exec -i db_mssql bash -c "cat > /tmp/_init.sql && /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P '${MSSQL_SA_PASSWORD:-Password1*}' -C -i /tmp/_init.sql" < "$sql_file" 2>&1)
-        if [ $? -ne 0 ]; then
-            sqlsrv_ok=0
-            echo -e "${RED}  $(basename "$sql_file") failed.${NC}"
-            echo "$out"
-        fi
-    done
-    if [ $sqlsrv_ok -eq 1 ]; then
-        echo -e "${GREEN}SQL Server initialization completed successfully.${NC}"
-    else
-        echo -e "${RED}SQL Server initialization failed.${NC}"
-    fi
-    echo -e "${CYAN}----------------------------------------${NC}"
 }
 
 # Show a checkbox menu to select tasks (dialog instead of whiptail)
 selected=$(dialog --title "Select Tasks to Run" --checklist \
 "Choose the tasks you want to execute:" 20 78 10 \
-"1" "Database Initialization (MySQL & SQL Server)" ON \
+"1" "Database Initialization (MySQL)" ON \
 "2" "Initialize Applications" ON 3>&1 1>&2 2>&3)
 
 exitcode=$?
