@@ -87,7 +87,7 @@ for task in $selected; do
                 app_start_time=$(date +%s)
                 if docker ps --format '{{.Names}}' | grep -q "$container_name"; then
                     echo -e "Initializing ${YELLOW}$app_name${NC}..."
-                    docker exec -i "$container_name" bash -c "cd /var/www/html && composer install"
+                    docker exec -i "$container_name" bash -c "cd /var/www/html && composer install && composer update"
                     composer_exit=$?
                     app_end_time=$(date +%s)
                     app_total_time=$((app_end_time - app_start_time))

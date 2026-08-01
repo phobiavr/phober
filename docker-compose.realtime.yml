@@ -110,8 +110,6 @@ services:
             OVERLAY_SECRET: ${OVERLAY_SECRET}
             SENTRY_DSN: "http://sentry@buggregator:8000/device-service"
             OTEL_SERVICE_NAME: device-queue
-            APP_URL: /hardware
-            AWS_URL: /s3/media
             #RABBITMQ_QUEUE: device
             #QUEUE_CONNECTION: rabbitmq
             QUEUE_CONNECTION: database
