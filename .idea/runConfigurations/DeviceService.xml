@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration name="Device Service" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" folderName="Services">
+    <CommandLine>
+      <PhpTestInterpreterSettings>
+        <option name="interpreterName" value="device-service" />
+      </PhpTestInterpreterSettings>
+    </CommandLine>
+    <TestRunner configuration_file="$PROJECT_DIR$/services/device-service/phpunit.xml" directory="$PROJECT_DIR$/services/device-service/tests" use_alternative_configuration_file="true" />
+    <method v="2" />
+  </configuration>
+</component>

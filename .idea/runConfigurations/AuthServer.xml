@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration name="Auth Server" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" folderName="Services">
+    <CommandLine>
+      <PhpTestInterpreterSettings>
+        <option name="interpreterName" value="auth-server" />
+      </PhpTestInterpreterSettings>
+    </CommandLine>
+    <TestRunner configuration_file="$PROJECT_DIR$/services/auth-server/phpunit.xml" directory="$PROJECT_DIR$/services/auth-server/tests" use_alternative_configuration_file="true" />
+    <method v="2" />
+  </configuration>
+</component>

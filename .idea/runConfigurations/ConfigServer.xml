@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration name="Config Server" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" folderName="Services">
+    <CommandLine>
+      <PhpTestInterpreterSettings>
+        <option name="interpreterName" value="config-server" />
+      </PhpTestInterpreterSettings>
+    </CommandLine>
+    <TestRunner configuration_file="$PROJECT_DIR$/services/config-server/phpunit.xml" directory="$PROJECT_DIR$/services/config-server/tests" use_alternative_configuration_file="true" />
+    <method v="2" />
+  </configuration>
+</component>

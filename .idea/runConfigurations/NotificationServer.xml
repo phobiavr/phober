@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration name="Notification Server" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" folderName="Services">
+    <CommandLine>
+      <PhpTestInterpreterSettings>
+        <option name="interpreterName" value="notification-server" />
+      </PhpTestInterpreterSettings>
+    </CommandLine>
+    <TestRunner configuration_file="$PROJECT_DIR$/services/notification-server/phpunit.xml" directory="$PROJECT_DIR$/services/notification-server/tests" use_alternative_configuration_file="true" />
+    <method v="2" />
+  </configuration>
+</component>

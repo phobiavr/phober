@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration name="Staff Service" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" folderName="Services">
+    <CommandLine>
+      <PhpTestInterpreterSettings>
+        <option name="interpreterName" value="staff-service" />
+      </PhpTestInterpreterSettings>
+    </CommandLine>
+    <TestRunner configuration_file="$PROJECT_DIR$/services/staff-service/phpunit.xml" directory="$PROJECT_DIR$/services/staff-service/tests" use_alternative_configuration_file="true" />
+    <method v="2" />
+  </configuration>
+</component>
